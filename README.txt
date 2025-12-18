@@ -1,5 +1,5 @@
 === Print.com Print on Demand ===
-Contributors: wcreate
+Contributors: printdotcom
 Donate link: https://print.com
 Tags: woocommerce
 Requires at least: 3.4
