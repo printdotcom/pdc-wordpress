@@ -1,0 +1,21 @@
+# action that will update the assets/readme
+name: Plugin asset/readme update
+on:
+  # only when something is merged to the main branch
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+jobs:
+  trunk:
+    name: Push to trunk
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Plugin asset/readme update
+      uses: 10up/action-wordpress-plugin-asset-update@stable
+      env:
+        SLUG: pdc-pod
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
