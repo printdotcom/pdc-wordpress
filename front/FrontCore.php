@@ -4,14 +4,14 @@
  *
  * Provides public-facing hooks and behavior for the plugin.
  *
- * @package Pdc_Connector
- * @subpackage Pdc_Connector/front
+ * @package Pdc_Pod
+ * @subpackage Pdc_Pod/front
  * @since 1.0.0
  */
 
-namespace PdcConnector\Front;
+namespace PdcPod\Front;
 
-use PdcConnector\Includes\Core;
+use PdcPod\Includes\Core;
 
 /**
  * The user-facing functionality of the plugin.
@@ -19,8 +19,8 @@ use PdcConnector\Includes\Core;
  * @link       https://print.com
  * @since      1.0.0
  *
- * @package    Pdc_Connector
- * @subpackage Pdc_Connector/front
+ * @package    Pdc_Pod
+ * @subpackage Pdc_Pod/front
  */
 
 /**
@@ -29,8 +29,8 @@ use PdcConnector\Includes\Core;
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the user-facing stylesheet and JavaScript.
  *
- * @package    Pdc_Connector
- * @subpackage Pdc_Connector/front
+ * @package    Pdc_Pod
+ * @subpackage Pdc_Pod/front
  * @author     Tijmen <tijmen@print.com>
  */
 class FrontCore {

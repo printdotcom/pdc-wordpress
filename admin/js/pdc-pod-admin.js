@@ -1,15 +1,15 @@
 (function ($) {
   'use strict';
 
-  const PLUGIN_NAME = pdcAdminApi.plugin_name;
+  const PLUGIN_NAME = PDC_POD_ADMIN.plugin_name;
 
   async function checkCredentials() {
     $(`#js-${PLUGIN_NAME}-auth-success`).hide();
     $(`#js-${PLUGIN_NAME}-auth-failed`).hide();
 
-    const pdcApiKey = $(`#pdc_api_key`).val();
+    const pdcPodApiKey = $(`#pdc_pod_api_key`).val();
 
-    if (!pdcApiKey) {
+    if (!pdcPodApiKey) {
       alert('No API Key entered');
       return;
     }
@@ -23,11 +23,10 @@
       $(`#js-${PLUGIN_NAME}-verify_key`).prop('disabled', true);
       $(`#js-${PLUGIN_NAME}-verify_loader`).addClass('is-active');
 
-      const response = await fetch(pdcAdminApi.pdc_url + '/products', {
+      const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/verify`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `PrintApiKey ${pdcApiKey}`,
+          'X-WP-Nonce': PDC_POD_ADMIN.nonce,
         },
       });
       if (response.status !== 200) {
@@ -69,9 +68,9 @@
         await $.ajax(
           {
             method: 'POST',
-            url: `${pdcAdminApi.root}pdc/v1/orders/${orderItemId}/attach-pdf`,
+            url: `${PDC_POD_ADMIN.root}pdc/v1/orders/${orderItemId}/attach-pdf`,
             beforeSend(xhr) {
-              xhr.setRequestHeader('X-WP-Nonce', pdcAdminApi.nonce);
+              xhr.setRequestHeader('X-WP-Nonce', PDC_POD_ADMIN.nonce);
             },
             data: {
               orderItemId,
@@ -112,10 +111,10 @@
     $('#js-pdc-request-response').text('');
     const orderItemId = e.target.getAttribute('data-order-item-id');
     try {
-      const response = await fetch(`${pdcAdminApi.root}pdc/v1/orders/${encodeURIComponent(orderItemId)}/purchase`, {
+      const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/orders/${encodeURIComponent(orderItemId)}/purchase`, {
         method: 'POST',
         headers: {
-          'X-WP-Nonce': pdcAdminApi.nonce,
+          'X-WP-Nonce': PDC_POD_ADMIN.nonce,
         },
       });
       const payload = await response.json().catch(() => ({}));
@@ -191,17 +190,17 @@
   // rehook dom elements when variations are loaded
   $(document).on('woocommerce_variations_loaded', function onVariationsLoaded() {
     loadPresetsForSKU();
-    $('.pdc-connector-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
+    $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
   });
 
   async function loadPresetsForSKU() {
     const sku = $('#js-pdc-product-selector').val();
     if (!sku) return;
     try {
-      const response = await fetch(`${pdcAdminApi.root}pdc/v1/products/${encodeURIComponent(sku)}/presets`, {
+      const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/products/${encodeURIComponent(sku)}/presets`, {
         method: 'GET',
         headers: {
-          'X-WP-Nonce': pdcAdminApi.nonce,
+          'X-WP-Nonce': PDC_POD_ADMIN.nonce,
         },
       });
       const payload = await response.json();
@@ -231,6 +230,6 @@
   $(document).ready(function () {
     $('#js-pdc-product-selector').on('change', loadPresetsForSKU);
     $('#pdc-product-file-upload').on('click', openMediaDialogFromOrder);
-    $('.pdc-connector-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
+    $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
   });
 })(jQuery);

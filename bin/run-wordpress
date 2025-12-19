@@ -95,7 +95,7 @@ fi
 EOF
 
 echo "Activating plug-in.."
-docker compose -f config/docker-compose.yml run --rm wpcli wp plugin activate pdc-connector --allow-root
+docker compose -f config/docker-compose.yml run --rm wpcli wp plugin activate pdc-pod --allow-root
 
 if [ "$WORDPRESS_VERSION_ENV" -ge 55 ] && [ -n "$PLUGINS_LIST" ]; then
   echo "Installing compatible plugins for WordPress ${WORDPRESS_PORT}.."

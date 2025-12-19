@@ -102,7 +102,7 @@ fi
 EOF
 
 # Activating Plugins
-execute_wp_cli plugin activate woocommerce pdc-connector
+execute_wp_cli plugin activate woocommerce pdc-pod
 
 # Clean up existing content
 echo "🧹 Cleaning up existing content..."

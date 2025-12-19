@@ -24,8 +24,8 @@ A WordPress plugin that integrates with the Print.com API to enable custom print
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/printdotcom/pdc-connector.git
-   cd pdc-connector
+   git clone https://github.com/printdotcom/pdc-pod.git
+   cd pdc-pod
    ```
 
 2. **Run composer**
@@ -88,7 +88,7 @@ The port format is `80[WORDPRESS_VERSION]`:
 
 ### Print.com API Credentials
 
-1. Navigate to **WordPress Admin → PDC Connector → Settings**
+1. Navigate to **WordPress Admin → Print.com → Settings**
 2. Enter your Print.com API credentials:
    - API Key
    - API Secret
@@ -106,7 +106,7 @@ This project follows:
 ### 🏗️ Project Structure
 
 ```
-pdc-connector/
+pdc-pod/
 ├── admin/                  # Admin-specific functionality
 │   ├── AdminCore.php      # Main admin class
 │   ├── PrintDotCom/       # Print.com API integration
@@ -141,9 +141,9 @@ The project uses PSR-4 autoloading via Composer:
 {
   "autoload": {
     "psr-4": {
-      "PdcConnector\\Admin\\": "admin/",
-      "PdcConnector\\Front\\": "front/",
-      "PdcConnector\\Includes\\": "includes/"
+      "PdcPod\\Admin\\": "admin/",
+      "PdcPod\\Front\\": "front/",
+      "PdcPod\\Includes\\": "includes/"
     }
   }
 }
@@ -176,7 +176,7 @@ bin/create-dist
 ## 📞 Support
 
 - **Documentation:** [Print.com Developer Docs](https://developer.print.com)
-- **Issues:** [GitHub Issues](https://github.com/printdotcom/pdc-connector/issues)
+- **Issues:** [GitHub Issues](https://github.com/printdotcom/pdc-pod/issues)
 - **Email:** [devops@print.com](mailto:devops@print.com)
 
 ## 📊 Changelog

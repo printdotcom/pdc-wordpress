@@ -21,14 +21,14 @@ interface Settings {
   usePresetCopies: boolean;
 }
 export async function setSettings(page, settings: Settings) {
-  await page.goto('/wp-admin/admin.php?page=pdc-connector');
-  await page.getByTestId('pdc-apikey').fill(settings.apikey);
-  await page.getByTestId('pdc-environment').selectOption('stg');
+  await page.goto('/wp-admin/admin.php?page=pdc-pod');
+  await page.getByTestId('pdc-pod-apikey').fill(settings.apikey);
+  await page.getByTestId('pdc-pod-environment').selectOption('stg');
 
   if (settings.usePresetCopies) {
-    await page.getByTestId('pdc-use_preset_copies').check();
+    await page.getByTestId('pdc-pod-use_preset_copies').check();
   } else {
-    await page.getByTestId('pdc-use_preset_copies').uncheck();
+    await page.getByTestId('pdc-pod-use_preset_copies').uncheck();
   }
 
   await page.getByRole('button', { name: 'Save Settings' }).click();

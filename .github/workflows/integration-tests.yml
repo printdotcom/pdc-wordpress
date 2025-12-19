@@ -17,6 +17,7 @@ jobs:
         include:
           - { wp: 60, php: 74 }
           - { wp: 68, php: 82 }
+          - { wp: 69, php: 83 }
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

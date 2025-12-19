@@ -1,5 +1,5 @@
 {
-    "name": "@printcom/pdc-connector",
+    "name": "@printcom/pdc-pod",
     "version": "1.0.0",
     "description": "Print.com Print on Demand",
     "main": "index.js",

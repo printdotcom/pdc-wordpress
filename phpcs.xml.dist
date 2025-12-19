@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="PDC Connector - WordPress Coding Standards">
+<ruleset name="PDC Pod - WordPress Coding Standards">
   <description>Project coding standards based on WordPress-Core, -Extra, and -Docs.</description>
 
   <!-- Show sniff codes and progress -->
@@ -11,7 +11,7 @@
   <file>admin</file>
   <file>front</file>
   <file>includes</file>
-  <file>pdc-connector.php</file>
+  <file>pdc-pod.php</file>
   <file>uninstall.php</file>
 
   	<!-- Ignore vendor and node modules -->
@@ -46,8 +46,8 @@
     <!-- Set your project-specific prefix to avoid false positives. -->
     <properties>
       <property name="prefixes" type="array">
-        <element value="pdc_connector"/>
-        <element value="PdcConnector"/>
+        <element value="pdc_pod"/>
+        <element value="PdcPod"/>
       </property>
     </properties>
   </rule>
@@ -59,4 +59,3 @@
   <!-- Allow WordPress i18n functions -->
   <rule ref="WordPress.WP.I18n"/>
 </ruleset>
-

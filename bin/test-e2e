@@ -53,8 +53,8 @@ fi
 # Check if mock API is running and set environment variables accordingly
 if curl -s --head --fail "http://localhost:8001/__admin" > /dev/null; then
   echo "Mock API detected - configuring tests to use mock API..."
-  export PDC_API_BASE_URL="http://localhost:8001"
-  export PDC_API_KEY="test_key_12345"
+  export PDC_POD_API_BASE_URL="http://localhost:8001"
+  export PDC_POD_API_KEY="test_key_12345"
 else
   echo "Mock API not running - tests will use configured API settings"
   echo "To use mock API, start it with: bin/run-mock-api start"

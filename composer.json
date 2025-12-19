@@ -1,12 +1,12 @@
 {
-  "name": "printdotcom/pdc-connector",
+  "name": "printdotcom/pdc-pod",
   "description": "Plug-in to connect to Print.com",
   "type": "project",
   "autoload": {
     "psr-4": {
-      "PdcConnector\\Admin\\": "admin/",
-      "PdcConnector\\Front\\": "front/",
-      "PdcConnector\\Includes\\": "includes/"
+      "PdcPod\\Admin\\": "admin/",
+      "PdcPod\\Front\\": "front/",
+      "PdcPod\\Includes\\": "includes/"
     }
   },
   "authors": [

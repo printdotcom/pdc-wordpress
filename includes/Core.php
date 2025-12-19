@@ -4,14 +4,14 @@
  *
  * Defines the core plugin class and bootstraps both admin and public hooks.
  *
- * @package Pdc_Connector
- * @subpackage Pdc_Connector/includes
+ * @package Pdc_Pod
+ * @subpackage Pdc_Pod/includes
  * @since 1.0.0
  */
 
-namespace PdcConnector\Includes;
+namespace PdcPod\Includes;
 
-use PdcConnector\Front\FrontCore;
+use PdcPod\Front\FrontCore;
 
 
 /**
@@ -23,8 +23,8 @@ use PdcConnector\Front\FrontCore;
  * @link       https://print.com
  * @since      1.0.0
  *
- * @package    Pdc_Connector
- * @subpackage Pdc_Connector/includes
+ * @package    Pdc_Pod
+ * @subpackage Pdc_Pod/includes
  */
 
 /**
@@ -37,8 +37,8 @@ use PdcConnector\Front\FrontCore;
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Pdc_Connector
- * @subpackage Pdc_Connector/includes
+ * @package    Pdc_Pod
+ * @subpackage Pdc_Pod/includes
  * @author     Tijmen <tijmen@print.com>
  */
 class Core {
@@ -83,7 +83,7 @@ class Core {
 	 * @return string Fully qualified meta key for storage.
 	 */
 	public static function get_meta_key( $name, $public_meta_key = false ) {
-		$meta_key_name = PDC_CONNECTOR_NAME . '_' . $name;
+		$meta_key_name = PDC_POD_NAME . '_' . $name;
 		if ( $public_meta_key ) {
 			return $meta_key_name;
 		}
@@ -96,10 +96,10 @@ class Core {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Pdc_Connector_Loader. Orchestrates the hooks of the plugin.
-	 * - Pdc_Connector_I18n. Defines internationalization functionality.
-	 * - Pdc_Connector_Admin. Defines all hooks for the admin area.
-	 * - Pdc_Connector_Public. Defines all hooks for the public side of the site.
+	 * - Pdc_Pod_Loader. Orchestrates the hooks of the plugin.
+	 * - Pdc_Pod_I18n. Defines internationalization functionality.
+	 * - Pdc_Pod_Admin. Defines all hooks for the admin area.
+	 * - Pdc_Pod_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -114,7 +114,7 @@ class Core {
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the Pdc_Connector_I18n class in order to set the domain and to register the hook
+	 * Uses the Pdc_Pod_I18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -136,7 +136,7 @@ class Core {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new \PdcConnector\Admin\AdminCore();
+		$plugin_admin = new \PdcPod\Admin\AdminCore();
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -182,7 +182,7 @@ class Core {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    Pdc_Connector_Loader    Orchestrates the hooks of the plugin.
+	 * @return    Pdc_Pod_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
 		return $this->loader;

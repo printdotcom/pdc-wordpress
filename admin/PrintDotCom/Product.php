@@ -4,12 +4,12 @@
  *
  * Provides a data structure for representing a Print.com Product within the admin context.
  *
- * @package Pdc_Connector
- * @subpackage Pdc_Connector/admin/PrintDotCom
+ * @package Pdc_Pod
+ * @subpackage Pdc_Pod/admin/PrintDotCom
  * @since 1.0.0
  */
 
-namespace PdcConnector\Admin\PrintDotCom;
+namespace PdcPod\Admin\PrintDotCom;
 
 /**
  * A class representing a Print.com Product
@@ -17,8 +17,8 @@ namespace PdcConnector\Admin\PrintDotCom;
  * @link       https://print.com
  * @since      1.0.0
  *
- * @package    Pdc_Connector
- * @subpackage Pdc_Connector/admin
+ * @package    Pdc_Pod
+ * @subpackage Pdc_Pod/admin
  */
 class Product {
 

@@ -4,12 +4,12 @@
  *
  * Registers all actions and filters for the plugin.
  *
- * @package Pdc_Connector
- * @subpackage Pdc_Connector/includes
+ * @package Pdc_Pod
+ * @subpackage Pdc_Pod/includes
  * @since 1.0.0
  */
 
-namespace PdcConnector\Includes;
+namespace PdcPod\Includes;
 
 /**
  * Register all actions and filters for the plugin
@@ -17,8 +17,8 @@ namespace PdcConnector\Includes;
  * @link       https://print.com
  * @since      1.0.0
  *
- * @package    Pdc_Connector
- * @subpackage Pdc_Connector/includes
+ * @package    Pdc_Pod
+ * @subpackage Pdc_Pod/includes
  */
 
 /**
@@ -28,8 +28,8 @@ namespace PdcConnector\Includes;
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Pdc_Connector
- * @subpackage Pdc_Connector/includes
+ * @package    Pdc_Pod
+ * @subpackage Pdc_Pod/includes
  * @author     Tijmen <tijmen@print.com>
  */
 class Loader {

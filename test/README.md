@@ -2,12 +2,12 @@
 
 ## API Client Configuration
 
-The PDC Connector APIClient supports environment variable overrides for testing purposes. This allows you to test against mock APIs or different environments without modifying production code.
+The PDC Pod APIClient supports environment variable overrides for testing purposes. This allows you to test against mock APIs or different environments without modifying production code.
 
 ### Environment Variables
 
-- `PDC_API_BASE_URL`: Override the API base URL (e.g., `http://localhost:8001` for mock API)
-- `PDC_API_KEY`: Override the API key (e.g., `test_key_12345` for mock API)
+- `PDC_POD_API_BASE_URL`: Override the API base URL (e.g., `http://localhost:8001` for mock API)
+- `PDC_POD_API_KEY`: Override the API key (e.g., `test_key_12345` for mock API)
 
 ### Usage Examples
 
@@ -17,8 +17,8 @@ The PDC Connector APIClient supports environment variable overrides for testing 
 bin/run-mock-api start
 
 # Set environment variables and test manually
-export PDC_API_BASE_URL="http://localhost:8001"
-export PDC_API_KEY="test_key_12345"
+export PDC_POD_API_BASE_URL="http://localhost:8001"
+export PDC_POD_API_KEY="test_key_12345"
 
 # Your API calls will now use the mock API
 ```
@@ -41,8 +41,8 @@ bin/test-e2e 67 82
 You can also manually set these for any testing scenario:
 
 ```bash
-export PDC_API_BASE_URL="https://api.stg.print.com"
-export PDC_API_KEY="your_staging_api_key"
+export PDC_POD_API_BASE_URL="https://api.stg.print.com"
+export PDC_POD_API_KEY="your_staging_api_key"
 ```
 
 ## Mock API

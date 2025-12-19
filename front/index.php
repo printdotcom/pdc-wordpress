@@ -2,6 +2,6 @@
 /**
  * Silence is golden
  *
- * @package Pdc_Connector
- * @subpackage Pdc_Connector/front
+ * @package Pdc_Pod
+ * @subpackage Pdc_Pod/front
  */
