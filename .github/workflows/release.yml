@@ -16,6 +16,8 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - name: Install PHP dependencies
+      run: composer install --no-dev --prefer-dist --optimize-autoloader
     - name: WordPress Plugin Deploy
       id: deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
