@@ -66,7 +66,8 @@ test.describe('product', () => {
       page.getByRole('button', { name: 'Update' }).click(),
       page.waitForResponse((r) => r.ok() && r.url().includes('rest_route=/pdc/v1/products/posters/presets'))]);
 
-    // open variations and
+    await page.waitForLoadState('networkidle');
+
     await page.locator('a[href="#variable_product_options"]').click();
 
     // open A2
