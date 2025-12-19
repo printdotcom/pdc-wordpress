@@ -1,12 +1,13 @@
 name: Integration Tests
 
 on:
-  push:
-    branches:
-      - '**'
   pull_request:
     branches:
-      - '**'
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   test:
