@@ -103,6 +103,54 @@ This project follows:
 - [WordPress Documentation Standards](https://developer.wordpress.org/coding-standards/inline-documentation-standards/)
 - [Conventional Commits](https://www.conventionalcommits.org/) for commit messages
 
+
+
+
+### Translations
+
+#### When a new translation is added
+
+When you add new strings that need translation in your PHP code:
+
+1. **Regenerate the POT template file:**
+   ```bash
+   wp i18n make-pot . languages/pdc-pod.pot
+   ```
+
+2. **Update existing PO files with new strings:**
+   ```bash
+   wp i18n update-po languages/pdc-pod.pot
+   ```
+
+3. **Translate the new strings** in each `.po` file using [Poedit](https://poedit.net/) or a text editor
+
+4. **Compile translations to MO files:**
+   ```bash
+   wp i18n make-mo languages
+   ```
+
+#### Adding a New Language
+
+When you want to add a new language:
+
+1. **Create a new PO file from the template:**
+   ```bash
+   cd languages
+   cp pdc-pod.pot pdc-pod-[LOCALE].po
+   ```
+   Replace `[LOCALE]` with the WordPress locale code (e.g., `es_ES` for Spanish, `it_IT` for Italian)
+
+2. **Update the PO file header** with language information:
+   - Set `Language-Team` and `Language` fields
+   - Add appropriate plural forms for the language
+
+3. **Translate all strings** using Poedit or manually edit the `msgstr` values
+
+4. **Compile to MO file:**
+   ```bash
+   wp i18n make-mo languages
+   ```
+
 ### 🏗️ Project Structure
 
 ```

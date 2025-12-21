@@ -4,233 +4,235 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Print.com Print on Demand 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pdc-connector\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: Tijmen <tijmen@print.com>\n"
+"Language-Team: Dutch\n"
+"Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2025-12-19T14:40:30+00:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-12-19 14:47+0000\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: pdc-pod\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Plugin Name of the plugin
 #: pdc-pod.php
 msgid "Print.com Print on Demand"
-msgstr ""
+msgstr "Print.com Print on Demand"
 
 #. Plugin URI of the plugin
 #: pdc-pod.php
 msgid "https://github.com/printdotcom/pdc-pod"
-msgstr ""
+msgstr "https://github.com/printdotcom/pdc-pod"
 
 #. Description of the plugin
 #: pdc-pod.php
 msgid "Allows customers to configure, edit and purchase products via the Print.com API."
-msgstr ""
+msgstr "Stelt klanten in staat om producten te configureren, bewerken en kopen via de Print.com API."
 
 #. Author of the plugin
 #: pdc-pod.php
 msgid "Print.com"
-msgstr ""
+msgstr "Print.com"
 
 #. Author URI of the plugin
 #: pdc-pod.php
 msgid "https://print.com"
-msgstr ""
+msgstr "https://print.com"
 
 #: admin/AdminCore.php:479
 msgid "Invalid credentials."
-msgstr ""
+msgstr "Ongeldige inloggegevens."
 
 #: admin/AdminCore.php:527
 msgid "Item is being produced at Print.com."
-msgstr ""
+msgstr "Het artikel wordt geproduceerd bij Print.com."
 
 #. translators: placeholder is a URL to the track & trace page.
 #: admin/AdminCore.php:594
 #, php-format
 msgid "Item has been shipped by Print.com. Track & Trace code: <a href=\"%1$s\">%2$s</a>."
-msgstr ""
+msgstr "Het artikel is verzonden door Print.com. Track & Trace code: <a href=\"%1$s\">%2$s</a>."
 
 #: admin/AdminCore.php:633
 msgid "Product SKU is required."
-msgstr ""
+msgstr "Product SKU is verplicht."
 
 #. translators: %s is the error message returned by the Print.com API.
 #: admin/AdminCore.php:644
 #, php-format
 msgid "Could not retrieve presets: %s"
-msgstr ""
+msgstr "Kon presets niet ophalen: %s"
 
 #: admin/AdminCore.php:676
 msgid "Order item ID is required."
-msgstr ""
+msgstr "Bestellingsartikel-ID is verplicht."
 
 #. translators: placeholder is the order number.
 #: admin/AdminCore.php:728
 #, php-format
 msgid "Item purchased at Print.com with order number: %s."
-msgstr ""
+msgstr "Artikel gekocht bij Print.com met bestelnummer: %s."
 
 #: admin/partials/html-input-mediaupload.php:22
 #: admin/partials/pdc-pod-admin-variation-data.php:57
 #: admin/partials/pdc-pod-html-order-metabox.php:91
 msgid "http://"
-msgstr ""
+msgstr "http://"
 
 #: admin/partials/html-input-mediaupload.php:23
 #: admin/partials/pdc-pod-admin-variation-data.php:61
 #: admin/partials/pdc-pod-admin-variation-data.php:65
 msgid "Choose file"
-msgstr ""
+msgstr "Kies bestand"
 
 #: admin/partials/html-input-mediaupload.php:23
 #: admin/partials/pdc-pod-admin-variation-data.php:62
 msgid "Insert file URL"
-msgstr ""
+msgstr "Voeg bestand-URL in"
 
 #: admin/partials/pdc-pod-admin-general.php:19
 msgid "This plugin allows you to connect your WooCommerce store to Print.com."
-msgstr ""
+msgstr "Deze plugin stelt je in staat om je WooCommerce winkel te verbinden met Print.com."
 
 #: admin/partials/pdc-pod-admin-preset-select.php:24
 msgid "Select a preset"
-msgstr ""
+msgstr "Selecteer een preset"
 
 #: admin/partials/pdc-pod-admin-producttab.php:31
 msgid "Print.com SKU"
-msgstr ""
+msgstr "Print.com SKU"
 
 #: admin/partials/pdc-pod-admin-producttab.php:37
 msgid "Choose a product"
-msgstr ""
+msgstr "Kies een product"
 
 #: admin/partials/pdc-pod-admin-producttab.php:44
 #: admin/partials/pdc-pod-admin-variation-data.php:39
 msgid "Print.com Preset"
-msgstr ""
+msgstr "Print.com Preset"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:22
 msgid "You can create an API key in your Print.com account settings. Visit"
-msgstr ""
+msgstr "Je kunt een API-sleutel aanmaken in je Print.com accountinstellingen. Bezoek"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:26
 msgid "create an API key and paste it in the input field below."
-msgstr ""
+msgstr "maak een API-sleutel aan en plak deze in het invoerveld hieronder."
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:30
 msgid "API Key verified. You are now connected!"
-msgstr ""
+msgstr "API-sleutel geverifieerd. Je bent nu verbonden!"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:33
 msgid "API Key is not valid. Check your environment and API Key"
-msgstr ""
+msgstr "De API-sleutel is niet geldig. Controleer je omgeving en API-sleutel"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:39
 msgid "API Key"
-msgstr ""
+msgstr "API-sleutel"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:44
 msgid "Verify"
-msgstr ""
+msgstr "Verifiëren"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:49
 msgid "Environment"
-msgstr ""
+msgstr "Omgeving"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:52
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:53
 msgid "Live"
-msgstr ""
+msgstr "Live"
 
 #: admin/partials/pdc-pod-admin-section-product.php:22
 msgid "Configure how to set up the product connection with Print.com."
-msgstr ""
+msgstr "Configureer de productverbinding met Print.com."
 
 #: admin/partials/pdc-pod-admin-section-product.php:27
 msgid "Presets"
-msgstr ""
+msgstr "Presets"
 
 #: admin/partials/pdc-pod-admin-section-product.php:31
 msgid "Use preset copies"
-msgstr ""
+msgstr "Gebruik preset kopieën"
 
 #: admin/partials/pdc-pod-admin-section-product.php:33
 msgid "When enabled, the number of copies from the preset will be used instead of allowing customers to choose their own quantity."
-msgstr ""
+msgstr "Indien ingeschakeld, wordt het aantal kopieën van de preset gebruikt in plaats van klanten hun eigen hoeveelheid te laten kiezen."
 
 #: admin/partials/pdc-pod-admin-variation-data.php:40
 msgid "Select a preset for this variant. When no preset is selected, it will use the default preset of this product."
-msgstr ""
+msgstr "Selecteer een preset voor deze variant. Wanneer geen preset is geselecteerd, wordt de standaard preset van dit product gebruikt."
 
 #: admin/partials/pdc-pod-admin-variation-data.php:54
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 #: admin/partials/pdc-pod-admin-variation-data.php:55
 msgid "Enter a URL or select a file which belongs to this variant. This file will be the design which the customer will order."
-msgstr ""
+msgstr "Voer een URL in of selecteer een bestand dat bij deze variant hoort. Dit bestand zal het ontwerp zijn dat de klant bestelt."
 
 #: admin/partials/pdc-pod-admin-variation-data.php:73
 msgid "Please connect a Print.com product to this WooCommerce product first."
-msgstr ""
+msgstr "Verbind eerst een Print.com product met dit WooCommerce product."
 
 #: admin/partials/pdc-pod-html-order-metabox.php:20
 msgid "Information"
-msgstr ""
+msgstr "Informatie"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:23
 msgid "Actions"
-msgstr ""
+msgstr "Acties"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:65
 msgid "Order item number"
-msgstr ""
+msgstr "Orderitem nummer"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:66
 msgid "Copies"
-msgstr ""
+msgstr "Oplage"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:67
 msgid "Purchase Date"
-msgstr ""
+msgstr "Inkoopdatum"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:68
 msgid "Item Status"
-msgstr ""
+msgstr "Item status"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:69
 msgid "Price"
-msgstr ""
+msgstr "Prijs"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:70
 msgid "Track & Trace"
-msgstr ""
+msgstr "Track & Trace"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:74
 msgid "File"
-msgstr ""
+msgstr "Bestand"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:81
 msgid "Missing file. Upload one to purchase."
-msgstr ""
+msgstr "Bestand ontbreekt. Upload er een om te kopen."
 
 #: admin/partials/pdc-pod-html-order-metabox.php:85
 msgid "Missing preset. You need a connected preset on the product to purchase."
-msgstr ""
+msgstr "Preset ontbreekt. Je hebt een verbonden preset op het product nodig om te kopen."
 
 #: admin/partials/pdc-pod-html-order-metabox.php:95
 msgid "Upload PDF"
-msgstr ""
+msgstr "Upload PDF"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:99
 msgid "Replace PDF"
-msgstr ""
+msgstr "Vervang PDF"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:101
 msgid "Purchase"
-msgstr ""
+msgstr "Kopen"
