@@ -4,20 +4,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Print.com Print on Demand 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pdc-connector\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: Tijmen <tijmen@print.com>\n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2025-12-19T14:40:30+00:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-12-19 14:46+0000\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: pdc-pod\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. Plugin Name of the plugin
 #: pdc-pod.php
 msgid "Print.com Print on Demand"
-msgstr ""
+msgstr "Print.com Impression à la Demande"
 
 #. Plugin URI of the plugin
 #: pdc-pod.php
@@ -27,7 +29,7 @@ msgstr ""
 #. Description of the plugin
 #: pdc-pod.php
 msgid "Allows customers to configure, edit and purchase products via the Print.com API."
-msgstr ""
+msgstr "Permet aux clients de configurer, modifier et acheter des produits via l'API Print.com."
 
 #. Author of the plugin
 #: pdc-pod.php
@@ -41,37 +43,37 @@ msgstr ""
 
 #: admin/AdminCore.php:479
 msgid "Invalid credentials."
-msgstr ""
+msgstr "Identifiants invalides."
 
 #: admin/AdminCore.php:527
 msgid "Item is being produced at Print.com."
-msgstr ""
+msgstr "L'article est en cours de production chez Print.com."
 
 #. translators: placeholder is a URL to the track & trace page.
 #: admin/AdminCore.php:594
 #, php-format
 msgid "Item has been shipped by Print.com. Track & Trace code: <a href=\"%1$s\">%2$s</a>."
-msgstr ""
+msgstr "L'article a été expédié par Print.com. Code de suivi : <a href=\"%1$s\">%2$s</a>."
 
 #: admin/AdminCore.php:633
 msgid "Product SKU is required."
-msgstr ""
+msgstr "Le SKU du produit est requis."
 
 #. translators: %s is the error message returned by the Print.com API.
 #: admin/AdminCore.php:644
 #, php-format
 msgid "Could not retrieve presets: %s"
-msgstr ""
+msgstr "Impossible de récupérer les préréglages : %s"
 
 #: admin/AdminCore.php:676
 msgid "Order item ID is required."
-msgstr ""
+msgstr "L'ID de l'article de commande est requis."
 
 #. translators: placeholder is the order number.
 #: admin/AdminCore.php:728
 #, php-format
 msgid "Item purchased at Print.com with order number: %s."
-msgstr ""
+msgstr "Article acheté chez Print.com avec le numéro de commande : %s."
 
 #: admin/partials/html-input-mediaupload.php:22
 #: admin/partials/pdc-pod-admin-variation-data.php:57
@@ -83,20 +85,20 @@ msgstr ""
 #: admin/partials/pdc-pod-admin-variation-data.php:61
 #: admin/partials/pdc-pod-admin-variation-data.php:65
 msgid "Choose file"
-msgstr ""
+msgstr "Choisir un fichier"
 
 #: admin/partials/html-input-mediaupload.php:23
 #: admin/partials/pdc-pod-admin-variation-data.php:62
 msgid "Insert file URL"
-msgstr ""
+msgstr "Insérer l'URL du fichier"
 
 #: admin/partials/pdc-pod-admin-general.php:19
 msgid "This plugin allows you to connect your WooCommerce store to Print.com."
-msgstr ""
+msgstr "Cette extension vous permet de connecter votre boutique WooCommerce à Print.com."
 
 #: admin/partials/pdc-pod-admin-preset-select.php:24
 msgid "Select a preset"
-msgstr ""
+msgstr "Sélectionner un préréglage"
 
 #: admin/partials/pdc-pod-admin-producttab.php:31
 msgid "Print.com SKU"
@@ -104,68 +106,68 @@ msgstr ""
 
 #: admin/partials/pdc-pod-admin-producttab.php:37
 msgid "Choose a product"
-msgstr ""
+msgstr "Choisir un produit"
 
 #: admin/partials/pdc-pod-admin-producttab.php:44
 #: admin/partials/pdc-pod-admin-variation-data.php:39
 msgid "Print.com Preset"
-msgstr ""
+msgstr "Préréglage Print.com"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:22
 msgid "You can create an API key in your Print.com account settings. Visit"
-msgstr ""
+msgstr "Vous pouvez créer une clé API dans les paramètres de votre compte Print.com. Visitez"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:26
 msgid "create an API key and paste it in the input field below."
-msgstr ""
+msgstr "créez une clé API et collez-la dans le champ ci-dessous."
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:30
 msgid "API Key verified. You are now connected!"
-msgstr ""
+msgstr "Clé API vérifiée. Vous êtes maintenant connecté !"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:33
 msgid "API Key is not valid. Check your environment and API Key"
-msgstr ""
+msgstr "La clé API n'est pas valide. Vérifiez votre environnement et votre clé API"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:39
 msgid "API Key"
-msgstr ""
+msgstr "Clé API"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:44
 msgid "Verify"
-msgstr ""
+msgstr "Vérifier"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:49
 msgid "Environment"
-msgstr ""
+msgstr "Environnement"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:52
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #: admin/partials/pdc-pod-admin-section-credentials.php:53
 msgid "Live"
-msgstr ""
+msgstr "Production"
 
 #: admin/partials/pdc-pod-admin-section-product.php:22
 msgid "Configure how to set up the product connection with Print.com."
-msgstr ""
+msgstr "Configurez la connexion du produit avec Print.com."
 
 #: admin/partials/pdc-pod-admin-section-product.php:27
 msgid "Presets"
-msgstr ""
+msgstr "Préréglages"
 
 #: admin/partials/pdc-pod-admin-section-product.php:31
 msgid "Use preset copies"
-msgstr ""
+msgstr "Utiliser les copies du préréglage"
 
 #: admin/partials/pdc-pod-admin-section-product.php:33
 msgid "When enabled, the number of copies from the preset will be used instead of allowing customers to choose their own quantity."
-msgstr ""
+msgstr "Lorsque cette option est activée, le nombre de copies du préréglage sera utilisé au lieu de permettre aux clients de choisir leur propre quantité."
 
 #: admin/partials/pdc-pod-admin-variation-data.php:40
 msgid "Select a preset for this variant. When no preset is selected, it will use the default preset of this product."
-msgstr ""
+msgstr "Sélectionnez un préréglage pour cette variante. Si aucun préréglage n'est sélectionné, le préréglage par défaut de ce produit sera utilisé."
 
 #: admin/partials/pdc-pod-admin-variation-data.php:54
 msgid "PDF"
@@ -173,64 +175,64 @@ msgstr ""
 
 #: admin/partials/pdc-pod-admin-variation-data.php:55
 msgid "Enter a URL or select a file which belongs to this variant. This file will be the design which the customer will order."
-msgstr ""
+msgstr "Entrez une URL ou sélectionnez un fichier appartenant à cette variante. Ce fichier sera le design que le client commandera."
 
 #: admin/partials/pdc-pod-admin-variation-data.php:73
 msgid "Please connect a Print.com product to this WooCommerce product first."
-msgstr ""
+msgstr "Veuillez d'abord connecter un produit Print.com à ce produit WooCommerce."
 
 #: admin/partials/pdc-pod-html-order-metabox.php:20
 msgid "Information"
-msgstr ""
+msgstr "Informations"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:23
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:65
 msgid "Order item number"
-msgstr ""
+msgstr "Numéro d'article de commande"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:66
 msgid "Copies"
-msgstr ""
+msgstr "Copies"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:67
 msgid "Purchase Date"
-msgstr ""
+msgstr "Date d'achat"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:68
 msgid "Item Status"
-msgstr ""
+msgstr "Statut de l'article"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:69
 msgid "Price"
-msgstr ""
+msgstr "Prix"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:70
 msgid "Track & Trace"
-msgstr ""
+msgstr "Suivi"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:74
 msgid "File"
-msgstr ""
+msgstr "Fichier"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:81
 msgid "Missing file. Upload one to purchase."
-msgstr ""
+msgstr "Fichier manquant. Téléchargez-en un pour effectuer l'achat."
 
 #: admin/partials/pdc-pod-html-order-metabox.php:85
 msgid "Missing preset. You need a connected preset on the product to purchase."
-msgstr ""
+msgstr "Préréglage manquant. Vous devez connecter un préréglage au produit pour effectuer l'achat."
 
 #: admin/partials/pdc-pod-html-order-metabox.php:95
 msgid "Upload PDF"
-msgstr ""
+msgstr "Télécharger un PDF"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:99
 msgid "Replace PDF"
-msgstr ""
+msgstr "Remplacer le PDF"
 
 #: admin/partials/pdc-pod-html-order-metabox.php:101
 msgid "Purchase"
-msgstr ""
+msgstr "Acheter"
