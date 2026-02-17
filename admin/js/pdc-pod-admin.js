@@ -227,9 +227,48 @@
     selectInput.value = targetValue.trim();
   }
 
+  /**
+   * because permalinks might not be assigned
+   * we want to prevent doubling the query seperator "?"
+   */
+  function constructURL({ path, queryParams }) {
+    let requestURL = `${PDC_POD_ADMIN.root}pdc/v1${path}`;
+
+    if (queryParams) {
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(queryParams)) {
+        params.append(key, value);
+      }
+      const separator = requestURL.includes('?') ? '&' : '?';
+      requestURL = `${requestURL}${separator}${params.toString()}`;
+    }
+
+    return requestURL;
+  }
+
   $(document).ready(function () {
     $('#js-pdc-product-selector').on('change', loadPresetsForSKU);
     $('#pdc-product-file-upload').on('click', openMediaDialogFromOrder);
     $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
+
+    // Handle select all checkbox
+    $('#pdc-select-all-products').on('change', function () {
+      const isChecked = $(this).prop('checked');
+      $('.pdc-product-checkbox').prop('checked', isChecked);
+    });
+
+    // Update select all checkbox state when individual checkboxes change
+    $(document).on('change', '.pdc-product-checkbox', function () {
+      const totalCheckboxes = $('.pdc-product-checkbox').length;
+      const checkedCheckboxes = $('.pdc-product-checkbox:checked').length;
+      $('#pdc-select-all-products').prop('checked', totalCheckboxes === checkedCheckboxes);
+    });
+
+    // Close dropdown when clicking outside
+    $(document).on('click', function (e) {
+      if (!$(e.target).closest('.product-search').length) {
+        $('#pdc-product-searchresults').hide();
+      }
+    });
   });
 })(jQuery);

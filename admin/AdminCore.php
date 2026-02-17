@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin core
  *
@@ -32,6 +33,7 @@ use PdcPod\Includes\Core;
  * @author     Tijmen <tijmen@print.com>
  */
 class AdminCore {
+
 	/**
 	 * Print.com API client instance.
 	 *
@@ -100,7 +102,7 @@ class AdminCore {
 	 */
 	public function add_menu_pages() {
 		add_menu_page( 'General Settings', 'Print.com', 'manage_options', PDC_POD_NAME, array( $this, 'page_general_settings' ), 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYWFnXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMCIgeT0iMCIgdmlld0JveD0iMCAwIDY5IDY5IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA2OSA2OSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CiAgPHN0eWxlPgogICAgLnN0MXtmaWxsOiNmZmZ9CiAgPC9zdHlsZT4KICA8cGF0aCBpZD0iUGF0aF82MDQiIGQ9Ik01MC4zIDY1LjVjLTIzLjIgOS4zLTQxIC4yLTQ4LjUtMjcuMS01LjUtMjAgMi0yNS4xIDIyLjctMzQuNEM0OC43LTYuOSA2Mi44IDUuNyA2Ny43IDI4LjJjMy44IDE3LjQtLjYgMzAuNS0xNy40IDM3LjN6IiBzdHlsZT0iZmlsbDojZmYwMDQ4Ii8+CiAgPGcgaWQ9Ikdyb3VwXzgxMzQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE2LjM3MiAyNC43MjgpIj4KICAgIDxnIGlkPSJHcm91cF84MTMyIj4KICAgICAgPHBhdGggaWQ9IlBhdGhfNjA1IiBjbGFzcz0ic3QxIiBkPSJNNC4xIDcuNVYxLjRDNC4yLjIgMy43LTEgMi44LTEuOCAxLjctMi42LjQtMy0uOS0yLjloLTVWMTVjMCAuNS4zLjguOS44aDIuN1YxMWMuNi42IDEuNC45IDIuMy44IDEuMSAwIDIuMi0uNCAzLTEuMS43LS45IDEuMS0yIDEuMS0zLjJ6TS41IDYuN2MwIC42LS4xIDEuMi0uMyAxLjctLjIuNC0uNy42LTEuMS42LS41IDAtMS0uMi0xLjQtLjZWMGgxLjRDMCAwIC41LjUuNSAxLjV2NS4yeiIvPgogICAgICA8cGF0aCBpZD0iUGF0aF82MDYiIGNsYXNzPSJzdDEiIGQ9Ik0xMi44LTMuMmMtMS4yLS4xLTIuMy43LTIuNiAxLjh2LS43YzAtLjUtLjMtLjgtLjktLjhINi41djEzLjdjMCAuNS4zLjguOS44aDIuN1YzLjFjLjEtMS4zIDEtMi41IDIuMy0yLjcuMiAwIC40LS4yLjUtLjR2LTMuMWMwLS4xIDAtLjEtLjEtLjF6Ii8+CiAgICAgIDxwYXRoIGlkPSJQYXRoXzYwNyIgY2xhc3M9InN0MSIgZD0iTTIzLjUgMTEuNWgyLjdWLjVjLjItLjYuOC0xIDEuNC0uOS44IDAgMS4yLjUgMS4yIDEuNHY5LjdjMCAuNS4zLjcuOC43aDIuOFYuOGMuMS0xLjEtLjMtMi4xLTEtMi45LS41LS44LTEuNC0xLjItMi40LTEuMS0xLjEtLjEtMi4yLjUtMi43IDEuNXYtLjRjMC0uNS0uMy0uOC0uOS0uOGgtMy44djIuM2MwIC4zLjMuNi42LjZoLjR2MTAuOGMuMS40LjMuNy45Ljd6Ii8+CiAgICAgIDxwYXRoIGlkPSJQYXRoXzYwOCIgY2xhc3M9InN0MSIgZD0iTTIwLjIgMTEuNVY5LjJjMC0uMy0uMy0uNi0uNi0uNkgxOVYtMi4yYzAtLjUtLjMtLjgtLjktLjhoLTIuN3YxMy43YzAgLjUuMy43LjkuN2gzLjl6Ii8+CiAgICAgIDxwYXRoIGlkPSJQYXRoXzYwOSIgY2xhc3M9InN0MSIgZD0iTTQwLjIgOC43aC0uNGMtLjggMC0xLjMtLjQtMS4zLTEuM1YwaDIuMXYtMi4xYzAtLjUtLjMtLjctLjgtLjdoLTEuNHYtMS4xYzAtLjUtLjMtLjgtLjktLjhIMzVWNi45YzAgMS42LjMgMi44IDEgMy41LjcuNyAxLjcgMS4xIDMuMiAxLjFoMS45VjkuNGMwLS41LS4zLS43LS45LS43eiIvPgogICAgICA8cGF0aCBpZD0iUGF0aF82MTAiIGNsYXNzPSJzdDEiIGQ9Ik0xOC4xLTQuOWMtMS40LjYtMi41IDAtMy0xLjctLjMtMS4yLjEtMS41IDEuNC0yLjEgMS41LS43IDIuNC4xIDIuNyAxLjUuMyAxIDAgMS44LTEuMSAyLjN6Ii8+CiAgICA8L2c+CiAgICA8ZyBpZD0iR3JvdXBfODEzMyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTguODI0IDM4LjQwNikiPgogICAgICA8cGF0aCBpZD0iUGF0aF82MTEiIGNsYXNzPSJzdDEiIGQ9Ik0tMS42LTIyYy0xLjctMS4xLTMuOS0xLjEtNS41IDAtLjcuNi0xIDEuNS0xIDIuNHY0LjVjLS4xLjkuMyAxLjggMSAyLjQgMS43IDEuMSAzLjkgMS4xIDUuNSAwIC43LS42IDEtMS41IDEtMi40di0uNmMwLS40LS4yLS42LS43LS42aC0xLjRjLS40IDAtLjcuMi0uNy42di42YzAgLjctLjMgMS4xLTEgMS4xcy0xLS40LTEtMS4xdi00LjZjMC0uNy4zLTEuMSAxLTEuMXMxIC40IDEgMS4xdi42YzAgLjQuMi42LjcuNmgxLjRjLjQgMCAuNy0uMi43LS42di0uNmMuMS0uOC0uMy0xLjctMS0yLjN6Ii8+CiAgICAgIDxwYXRoIGlkPSJQYXRoXzYxMiIgY2xhc3M9InN0MSIgZD0iTTcuNS0yMmMtMS43LTEuMS0zLjktMS4xLTUuNSAwLS43LjYtMSAxLjUtMSAyLjR2NC41Yy0uMS45LjMgMS44IDEgMi40IDEuNyAxLjEgMy45IDEuMSA1LjUgMCAuNy0uNiAxLTEuNSAxLTIuNHYtNC41YzAtLjktLjQtMS44LTEtMi40em0tMS44IDYuOWMwIC43LS4zIDEuMS0xIDEuMXMtMS0uNC0xLTEuMXYtNC42YzAtLjcuMy0xLjEgMS0xLjFzMSAuNCAxIDEuMXY0LjZ6Ii8+CiAgICAgIDxwYXRoIGlkPSJQYXRoXzYxMyIgY2xhc3M9InN0MSIgZD0iTS0xMC4zLTEyYy0xLjEuNS0yIDAtMi40LTEuMy0uMy0xIC4xLTEuMiAxLjEtMS43IDEuMi0uNSAxLjkuMSAyLjEgMS4yLjQuNyAwIDEuNS0uOCAxLjguMS0uMS4xLS4xIDAgMHoiLz4KICAgICAgPHBhdGggaWQ9IlBhdGhfNjE0IiBjbGFzcz0ic3QxIiBkPSJNMjIuNi0xNC4zaC0uNHYtNS42YzAtLjgtLjItMS42LS43LTIuMi0uNS0uNS0xLjItLjgtMi0uOC0xIDAtMS45LjUtMi40IDEuMy0uNC0uOC0xLjMtMS4zLTIuMy0xLjItLjgtLjEtMS42LjMtMiAxLjF2LS4zYzAtLjQtLjItLjYtLjctLjZIOS40djEuOGMwIC4yLjIuNC40LjRoLjN2Ny44YzAgLjQuMi41LjcuNWgydi04Yy4xLS40LjYtLjcgMS0uNy42IDAgLjkuNC45IDEuMXY3LjFjMCAuNC4yLjUuNi41aDIuMXYtOGMuMi0uNC42LS43IDEtLjcuNiAwIC45LjQuOSAxLjF2Ny4xYzAgLjQuMi41LjYuNWgyLjl2LTEuN2MuMy0uMy4xLS41LS4yLS41eiIvPgogICAgPC9nPgogIDwvZz4KPC9zdmc+' );
-		add_submenu_page( PDC_POD_NAME, __( 'Products', PDC_POD_NAME ), __('Products', PDC_POD_NAME ), 'manage_options', PDC_POD_NAME . '-products', array( $this, 'page_product_mapping' ));
+		add_submenu_page( PDC_POD_NAME, __( 'Products', PDC_POD_NAME ), __( 'Products', PDC_POD_NAME ), 'manage_options', PDC_POD_NAME . '-products', array( $this, 'page_product_mapping' ) );
 	}
 
 	/**
@@ -465,6 +467,7 @@ class AdminCore {
 				},
 			)
 		);
+
 		register_rest_route(
 			'pdc/v1',
 			'/orders/webhook',
@@ -472,6 +475,30 @@ class AdminCore {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'pdc_order_webhook' ),
 				'permission_callback' => '__return_true',
+			)
+		);
+
+		register_rest_route(
+			'pdc/v1',
+			'/wc-products',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'search_wc_products' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'pdc/v1',
+			'/wc-products/attributes',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'get_product_attributes' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
 			)
 		);
 	}
@@ -494,6 +521,85 @@ class AdminCore {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Search for products and filters on variations
+	 *
+	 * @since 1.1.0
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return bool|WP_Error
+	 */
+	public function search_wc_products( \WP_REST_Request $request ) {
+		$search = $request->get_param( 'q' );
+
+		$products = wc_get_products(
+			array(
+				's'      => $search,
+				'limit'  => 20,
+			)
+		);
+
+		$results = array();
+		foreach ( $products as $product ) {
+			$results[] = array(
+				'id'   => $product->get_id(),
+				'text' => $product->get_name(),
+				'type' => $product->get_type(),
+			);
+		}
+
+		wp_send_json( $results );
+	}
+
+	/**
+	 * Gets available attributes for selected product(s).
+	 *
+	 * @since 1.1.0
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return array
+	 */
+	public function get_product_attributes( \WP_REST_Request $request ) {
+		$product_ids = $request->get_param( 'product_ids' );
+		$product_ids = is_array( $product_ids ) ? array_map( 'intval', $product_ids ) : array( intval( $product_ids ) );
+
+		if ( empty( $product_ids ) ) {
+			return rest_ensure_response( array() );
+		}
+
+		$all_attributes = array();
+
+		foreach ( $product_ids as $product_id ) {
+			$product = wc_get_product( $product_id );
+
+			if ( ! $product ) {
+				continue;
+			}
+
+			if ( $product->is_type( 'variable' ) ) {
+				$variations = $product->get_available_variations();
+
+				foreach ( $variations as $variation_data ) {
+					foreach ( $variation_data['attributes'] as $attr_key => $attr_value ) {
+						$attr_name = str_replace( 'attribute_', '', $attr_key );
+
+						if ( ! isset( $all_attributes[ $attr_name ] ) ) {
+							$all_attributes[ $attr_name ] = array(
+								'name'   => wc_attribute_label( $attr_name ),
+								'slug'   => $attr_name,
+								'values' => array(),
+							);
+						}
+
+						if ( ! in_array( $attr_value, $all_attributes[ $attr_name ]['values'], true ) && ! empty( $attr_value ) ) {
+							$all_attributes[ $attr_name ]['values'][] = $attr_value;
+						}
+					}
+				}
+			}
+		}
+
+		return rest_ensure_response( array_values( $all_attributes ) );
 	}
 
 	/**
