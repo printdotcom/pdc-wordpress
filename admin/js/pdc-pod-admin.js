@@ -189,13 +189,14 @@
 
   // rehook dom elements when variations are loaded
   $(document).on('woocommerce_variations_loaded', function onVariationsLoaded() {
-    loadPresetsForSKU();
+    const sku = $('#js-pdc-product-selector').val();
+    if (!sku) return;
+
+    loadPresetsForSKU(sku);
     $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
   });
 
-  async function loadPresetsForSKU() {
-    const sku = $('#js-pdc-product-selector').val();
-    if (!sku) return;
+  async function loadPresetsForSKU(sku) {
     try {
       const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/products/${encodeURIComponent(sku)}/presets`, {
         method: 'GET',
@@ -227,27 +228,10 @@
     selectInput.value = targetValue.trim();
   }
 
-  /**
-   * because permalinks might not be assigned
-   * we want to prevent doubling the query seperator "?"
-   */
-  function constructURL({ path, queryParams }) {
-    let requestURL = `${PDC_POD_ADMIN.root}pdc/v1${path}`;
-
-    if (queryParams) {
-      const params = new URLSearchParams();
-      for (const [key, value] of Object.entries(queryParams)) {
-        params.append(key, value);
-      }
-      const separator = requestURL.includes('?') ? '&' : '?';
-      requestURL = `${requestURL}${separator}${params.toString()}`;
-    }
-
-    return requestURL;
-  }
-
   $(document).ready(function () {
-    $('#js-pdc-product-selector').on('change', loadPresetsForSKU);
+    $('#js-pdc-product-selector').on('change', (e) => {
+      loadPresetsForSKU(e.target.value);
+    });
     $('#pdc-product-file-upload').on('click', openMediaDialogFromOrder);
     $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
 
@@ -255,6 +239,7 @@
     $('#pdc-select-all-products').on('change', function () {
       const isChecked = $(this).prop('checked');
       $('.pdc-product-checkbox').prop('checked', isChecked);
+      updateAssignPresetsButtonState();
     });
 
     // Update select all checkbox state when individual checkboxes change
@@ -262,6 +247,94 @@
       const totalCheckboxes = $('.pdc-product-checkbox').length;
       const checkedCheckboxes = $('.pdc-product-checkbox:checked').length;
       $('#pdc-select-all-products').prop('checked', totalCheckboxes === checkedCheckboxes);
+      updateAssignPresetsButtonState();
+    });
+
+    // Function to enable/disable assign presets button
+    function updateAssignPresetsButtonState() {
+      const checkedCheckboxes = $('.pdc-product-checkbox:checked').length;
+      const presetSelected = $('#js-pdc-preset-list').val();
+      const fileSelected = $('#_pdc-file_url').val();
+      const hasPresetOrFile = presetSelected || fileSelected;
+      
+      const button = $('#pdc-assign-presets-btn');
+      button.prop('disabled', checkedCheckboxes === 0 || !hasPresetOrFile);
+      
+      // Update button text with product count
+      if (checkedCheckboxes > 0) {
+        button.text(`Assign Presets (${checkedCheckboxes} product${checkedCheckboxes !== 1 ? 's' : ''})`);
+      } else {
+        button.text('Assign Presets');
+      }
+    }
+
+    // Watch for changes in preset and file inputs
+    $('#js-pdc-preset-list, #_pdc-file_url').on('change input', function () {
+      updateAssignPresetsButtonState();
+    });
+
+    // Handle assign presets button click
+    $('#pdc-assign-presets-btn').on('click', async function (e) {
+      e.preventDefault();
+      
+      const button = $(this);
+      const selectedProducts = $('.pdc-product-checkbox:checked').map(function () {
+        return $(this).val();
+      }).get();
+      
+      const presetId = $('#js-pdc-preset-list').val();
+      const pdfUrl = $('#_pdc-file_url').val();
+      const sku = $('#js-pdc-product-selector').val();
+      
+      if (selectedProducts.length === 0) {
+        alert('Please select at least one product.');
+        return;
+      }
+      
+      if (!presetId && !pdfUrl) {
+        alert('Please select a preset or upload a PDF file.');
+        return;
+      }
+      
+      // Disable button and show loading state
+      button.prop('disabled', true);
+      const originalText = button.text();
+      button.text('Assigning...');
+      
+      try {
+        const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/products/bulk-assign`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': PDC_POD_ADMIN.nonce,
+          },
+          body: JSON.stringify({
+            product_ids: selectedProducts,
+            product_sku: sku,
+            preset_id: presetId,
+            pdf_url: pdfUrl,
+          }),
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to assign presets.');
+        }
+        
+        // Show success message
+        let message = `Successfully updated ${result.updated_count} of ${result.total_count} products.`;
+        if (result.errors && result.errors.length > 0) {
+          message += '\n\nErrors:\n' + result.errors.join('\n');
+        }
+        alert(message);
+        button.prop('disabled', false);
+        button.text(originalText);
+      } catch (error) {
+        alert('Error: ' + error.message);
+        button.prop('disabled', false);
+        button.text(originalText);
+      }
     });
 
     // Close dropdown when clicking outside

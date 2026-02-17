@@ -66,3 +66,21 @@ ul.autocomplete__menu {
 .woocommerce_variation a.button-select-pdf-file {
 	padding: 4px 10px 5px 10px;
 }
+
+.pdc-preset-table-actions {
+	width: 1200px;
+	max-width: 100%;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 10px;
+	align-items: flex-start;
+}
+
+.pdc-preset-table-actions p.form-field {
+	display: flex;
+	flex-direction: column;
+}
+
+.form-flex-box {
+	display: flex;
+}

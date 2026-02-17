@@ -34,6 +34,7 @@ use PdcPod\Includes\Core;
  */
 class AdminCore {
 
+
 	/**
 	 * Print.com API client instance.
 	 *
@@ -364,6 +365,76 @@ class AdminCore {
 	 * @return      void
 	 */
 	public function page_product_mapping() {
+		$pdc_products = $this->pdc_client->search_products();
+		$search       = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+		$paged        = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
+		$per_page     = 20;
+
+		// total count
+		$count_args = array(
+			'return' => 'ids',
+			'limit'  => -1,
+			'type'   => array( 'simple', 'variable', 'grouped', 'external', 'variation' ),
+		);
+
+		if ( ! empty( $search ) ) {
+			$count_args['s'] = $search;
+		}
+
+		$total_products = count( wc_get_products( $count_args ) );
+		$total_pages    = ceil( $total_products / $per_page );
+
+		$args = array(
+			'limit'  => $per_page,
+			'offset' => ( $paged - 1 ) * $per_page,
+			'type'   => array( 'simple', 'variable', 'grouped', 'external', 'variation' ),
+		);
+
+		if ( ! empty( $search ) ) {
+			$args['s'] = $search;
+		}
+
+		$products          = wc_get_products( $args );
+		$items             = array();
+		$parent_ids_needed = array();
+
+		foreach ( $products as $product ) {
+			$product_type = $product->get_type();
+			$parent_id    = method_exists( $product, 'get_parent_id' ) ? $product->get_parent_id() : 0;
+			$product_id   = $product->get_id();
+
+			$items[] = array(
+				'id'        => $product_id,
+				'name'      => $product->get_name(),
+				'type'      => $product_type,
+				'parent_id' => $parent_id,
+			);
+
+			// Track parent IDs for variations
+			if ( 'variation' === $product_type && $parent_id > 0 ) {
+				$parent_ids_needed[ $parent_id ] = true;
+			}
+		}
+
+		usort(
+			$items,
+			function ( $a, $b ) {
+				$a_group = $a['parent_id'] > 0 ? $a['parent_id'] : $a['id'];
+				$b_group = $b['parent_id'] > 0 ? $b['parent_id'] : $b['id'];
+
+				if ( $a_group !== $b_group ) {
+					return $a_group - $b_group;
+				}
+
+				if ( $a['parent_id'] !== $b['parent_id'] ) {
+					return $a['parent_id'] - $b['parent_id'];
+				}
+
+				// Same level, sort by ID
+				return $a['id'] - $b['id'];
+			}
+		);
+
 		include plugin_dir_path( __FILE__ ) . 'partials/' . PDC_POD_NAME . '-admin-preset-table.php';
 	}
 
@@ -501,6 +572,18 @@ class AdminCore {
 				},
 			)
 		);
+
+		register_rest_route(
+			'pdc/v1',
+			'/products/bulk-assign',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'bulk_assign_presets' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -535,8 +618,9 @@ class AdminCore {
 
 		$products = wc_get_products(
 			array(
-				's'      => $search,
-				'limit'  => 20,
+				's'     => $search,
+				'limit' => 20,
+				'type'  => array( 'simple', 'variable', 'grouped', 'external', 'variation' ),
 			)
 		);
 
@@ -923,5 +1007,76 @@ class AdminCore {
 				update_post_meta( $variation_id, $meta_key, $val );
 			}
 		}
+	}
+
+	/**
+	 * Handles bulk assignment of presets and PDF to multiple products.
+	 *
+	 * @since 1.1.0
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return \WP_REST_Response|\WP_Error REST response or error.
+	 */
+	public function bulk_assign_presets( \WP_REST_Request $request ) {
+		$product_ids = $request->get_param( 'product_ids' );
+		$preset_id   = $request->get_param( 'preset_id' );
+		$pdf_url     = $request->get_param( 'pdf_url' );
+		$product_sku     	 = $request->get_param( 'product_sku' );
+
+		if ( empty( $product_ids ) || ! is_array( $product_ids ) ) {
+			return new \WP_Error(
+				'pdc_missing_products',
+				__( 'Product IDs are required.', 'pdc-pod' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		if ( empty( $preset_id ) && empty( $pdf_url ) ) {
+			return new \WP_Error(
+				'pdc_missing_data',
+				__( 'At least one of preset ID or PDF URL must be provided.', 'pdc-pod' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$updated_count = 0;
+		$errors        = array();
+
+		foreach ( $product_ids as $product_id ) {
+			$product_id = absint( $product_id );
+			if ( $product_id <= 0 ) {
+				continue;
+			}
+
+			try {
+				// Update preset ID if provided
+				if ( ! empty( $preset_id ) ) {
+					update_post_meta( $product_id, $this->get_meta_key( 'product_sku' ), sanitize_text_field( $product_sku ) );
+					update_post_meta( $product_id, $this->get_meta_key( 'preset_id' ), sanitize_text_field( $preset_id ) );
+				}
+
+				// Update PDF URL if provided
+				if ( ! empty( $pdf_url ) ) {
+					update_post_meta( $product_id, $this->get_meta_key( 'pdf_url' ), esc_url_raw( $pdf_url ) );
+				}
+
+				++$updated_count;
+			} catch ( \Exception $e ) {
+				$errors[] = sprintf(
+					// translators: %1$d is the product ID, %2$s is the error message.
+					__( 'Product %1$d: %2$s', 'pdc-pod' ),
+					$product_id,
+					$e->getMessage()
+				);
+			}
+		}
+
+		return rest_ensure_response(
+			array(
+				'success'       => true,
+				'updated_count' => $updated_count,
+				'total_count'   => count( $product_ids ),
+				'errors'        => $errors,
+			)
+		);
 	}
 }

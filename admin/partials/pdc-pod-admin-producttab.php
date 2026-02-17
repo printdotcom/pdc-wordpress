@@ -27,19 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="pdc_product_data_tab" class="panel woocommerce_options_panel">
 	<?php wp_nonce_field( 'pdc_pod_save_product', 'pdc_pod_nonce' ); ?>
 	<div class="options_group pdc_product_options">
-		<p class="form-field">
-			<label for="js-pdc-product-selector"><?php esc_html_e( 'Print.com SKU', 'pdc-pod' ); ?></label>
-			<select
-				id="js-pdc-product-selector"
-				data-testid="pdc-product-sku"
-				name="<?php echo esc_attr( $this->get_meta_key( 'product_sku' ) ); ?>"
-				value="<?php echo esc_attr( (string) $pdc_pod_sku ); ?>">
-				<option disabled selected value><?php esc_html_e( 'Choose a product', 'pdc-pod' ); ?></option>
-				<?php foreach ( $pdc_products as $pdc_pod ) { ?>
-					<option value="<?php echo esc_attr( $pdc_pod->sku ); ?>" <?php selected( $pdc_pod->sku, $pdc_pod_sku ); ?>><?php echo esc_attr( $pdc_pod->title ); ?></option>
-				<?php } ?>
-			</select>
-		</p>
+		<?php require plugin_dir_path( __FILE__ ) . '/' . PDC_POD_NAME . '-admin-product-select.php'; ?>
 		<p class="form-field">
 			<label for="pdc-presets-label"><?php esc_html_e( 'Print.com Preset', 'pdc-pod' ); ?></label>
 			<span class="pdc-ac-preset-list">
@@ -54,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		 *
 		 * @since 1.0.0
 		 */
-		require_once __DIR__ . '/html-input-mediaupload.php';
+		require plugin_dir_path( __FILE__ ) . PDC_POD_NAME . '-admin-input-media.php';
 		?>
 	</div>
 </div>
