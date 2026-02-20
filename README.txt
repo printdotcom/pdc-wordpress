@@ -4,7 +4,7 @@ Donate link: https://print.com
 Tags: woocommerce
 Requires at least: 3.4
 Tested up to: 6.9
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,6 +34,11 @@ You can request an account by contacting Print.com at +31 (0)88 751 11 11 or mai
 Unfortunately we cannot store prices as they change every week. This might be a feature that will be implemented.
 
 == Changelog ==
+
+= 1.0.1 =
+
+* feat: added basic translations for Dutch, French and German.
+* fix: request source was not sent, simplified header parsing.
 
 = 1.0.0 =
 * Initial version of the plug-in.
