@@ -143,17 +143,7 @@ class APIClient {
 		}
 
 		if ( ! empty( $headers ) ) {
-			// Merge string header formats like 'key: value' or associative arrays.
-			foreach ( $headers as $h ) {
-				if ( is_string( $h ) && false !== strpos( $h, ':' ) ) {
-					list($k, $v) = array_map( 'trim', explode( ':', $h, 2 ) );
-					if ( $k ) {
-						$args['headers'][ $k ] = $v;
-					}
-				} elseif ( is_array( $h ) ) {
-					$args['headers'] = array_merge( $args['headers'], $h );
-				}
-			}
+			$args['headers'] = array_merge( $args['headers'], $headers );
 		}
 
 		if ( 'GET' === $method && ! empty( $data ) && is_array( $data ) ) {

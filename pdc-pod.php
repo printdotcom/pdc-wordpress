@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  * @var string PDC_POD_VERSION Plugin version.
  */
-define( 'PDC_POD_VERSION', '1.0.0' );
+define( 'PDC_POD_VERSION', '1.0.1' );
 
 /**
  * Plugin name
