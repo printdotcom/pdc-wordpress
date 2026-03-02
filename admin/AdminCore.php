@@ -43,10 +43,11 @@ class AdminCore {
 	/**
 	 * Initialize the class and set its properties.
 	 *
+	 * @param APIClient $pdc_api_client
 	 * @since    1.0.0
 	 */
-	public function __construct() {
-		$this->pdc_client = new APIClient();
+	public function __construct( $pdc_api_client ) {
+		$this->pdc_client = $pdc_api_client;
 	}
 
 	/**
@@ -758,8 +759,12 @@ class AdminCore {
 
 		$pdc_pod_index = isset( $index ) ? intval( $index ) : 0;
 
-		$pdc_pod_sku       = get_post_meta( $pdc_pod_parent_id, $pdc_pod_meta_key_sku, true );
+		$pdc_pod_parent_sku       = get_post_meta( $pdc_pod_parent_id, $pdc_pod_meta_key_sku, true );
+		$pdc_pod_variantion_sku       = get_post_meta( $pdc_pod_variation_id, $pdc_pod_meta_key_sku, true );
+		$pdc_pod_sku = ! empty($pdc_pod_variantion_sku) ? $pdc_pod_variantion_sku : $pdc_pod_parent_sku;
 		$pdc_pod_preset_id = get_post_meta( $pdc_pod_variation_id, $pdc_pod_meta_key_preset_id, true );
+
+		$pdc_pod_products = $this->pdc_client->search_products();
 
 		$pdc_pod_presets_for_sku = array();
 		if ( ! empty( $pdc_pod_sku ) ) {
@@ -778,7 +783,6 @@ class AdminCore {
 	 * @return void
 	 */
 	public function save_variation_data_fields( $variation_id, $i ) {
-
 		$nonce = isset( $_POST[ PDC_POD_NAME . '_variations_nonce' . $i ] )
 			? sanitize_text_field( wp_unslash( $_POST[ PDC_POD_NAME . '_variations_nonce' . $i ] ) )
 			: '';
@@ -789,6 +793,7 @@ class AdminCore {
 
 		$fields = array(
 			'pdf_url'   => $this->get_meta_key( 'pdf_url' ),
+			'product_sku'   => $this->get_meta_key( 'product_sku' ),
 			'preset_id' => $this->get_meta_key( 'preset_id' ),
 		);
 

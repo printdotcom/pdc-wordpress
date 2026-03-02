@@ -28,7 +28,9 @@ class Test_APIClient extends TestCase {
 
     public static function setUpBeforeClass() : void
     {
-        define('PDC_POD_NAME', 'pdc-pod-test');
+		if (!defined('PDC_POD_NAME')) {
+			define('PDC_POD_NAME', 'pdc-pod');
+		}
     }
 
 	/**
@@ -39,7 +41,7 @@ class Test_APIClient extends TestCase {
 	public function test_constructor_sets_base_url_using_env() {
         WP_Mock::userFunction('get_option', [
             'times' => 1,
-            'args'  => ['pdc-pod-test-api_key'],
+            'args'  => ['pdc-pod-api_key'],
             'return' => 'fake-api-key',
         ] );
 
@@ -60,13 +62,13 @@ class Test_APIClient extends TestCase {
 	public function test_constructor_sets_printcom_baseurl_when_env_option_is_prod() {
         WP_Mock::userFunction('get_option', [
             'times' => 1,
-            'args'  => ['pdc-pod-test-env'],
+            'args'  => ['pdc-pod-env'],
             'return' => 'prod',
         ] );
 
         WP_Mock::userFunction('get_option', [
             'times' => 1,
-            'args'  => ['pdc-pod-test-api_key'],
+            'args'  => ['pdc-pod-api_key'],
             'return' => 'fake-api-key',
         ] );
 
@@ -83,12 +85,12 @@ class Test_APIClient extends TestCase {
 	public function test_constructor_sets_printcom_baseurl_when_env_option_is_not_set() {
         WP_Mock::userFunction('get_option', [
             'times' => 1,
-            'args'  => ['pdc-pod-test-env'],
+            'args'  => ['pdc-pod-env'],
         ] );
 
         WP_Mock::userFunction('get_option', [
             'times' => 1,
-            'args'  => ['pdc-pod-test-api_key'],
+            'args'  => ['pdc-pod-api_key'],
             'return' => 'fake-api-key',
         ] );
 

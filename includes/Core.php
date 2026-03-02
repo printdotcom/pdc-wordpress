@@ -12,6 +12,7 @@
 namespace PdcPod\Includes;
 
 use PdcPod\Front\FrontCore;
+use PdcPod\Admin\PrintDotCom\APIClient;
 
 
 /**
@@ -136,7 +137,7 @@ class Core {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new \PdcPod\Admin\AdminCore();
+		$plugin_admin = new \PdcPod\Admin\AdminCore( new APIClient() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
