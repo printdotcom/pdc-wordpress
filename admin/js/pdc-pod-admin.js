@@ -189,13 +189,16 @@
 
   // rehook dom elements when variations are loaded
   $(document).on('woocommerce_variations_loaded', function onVariationsLoaded() {
-    loadPresetsForSKU();
+    $('.js-pdc-product-selector').on('change', (e) => loadPresetsForSKU(e.target));
     $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
   });
 
-  async function loadPresetsForSKU() {
-    const sku = $('#js-pdc-product-selector').val();
+  async function loadPresetsForSKU(target) {
+    const sku = target.value;
     if (!sku) return;
+
+    const productID = target.dataset.product_id;
+    const presetTargets = document.querySelectorAll(`.js-pdc-preset-list-${productID}`);
     try {
       const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/products/${encodeURIComponent(sku)}/presets`, {
         method: 'GET',
@@ -209,13 +212,7 @@
       }
       const presetOptionsHTML = payload?.html || '';
 
-      // set options for main product
-      const presetSelectInput = document.getElementById('js-pdc-preset-list');
-      setSelectedValue(presetSelectInput, presetOptionsHTML);
-
-      // set options for each variation
-      const variationPresetInputs = document.querySelectorAll('.pdc_variation_preset_select');
-      variationPresetInputs.forEach((selectInput) => setSelectedValue(selectInput, presetOptionsHTML));
+      presetTargets.forEach((selectInput) => setSelectedValue(selectInput, presetOptionsHTML));
     } catch (err) {
       console.error('Failed to load presets', err);
     }
@@ -228,7 +225,7 @@
   }
 
   $(document).ready(function () {
-    $('#js-pdc-product-selector').on('change', loadPresetsForSKU);
+    $('#js-pdc-product-selector').on('change', (e) => loadPresetsForSKU(e.target));
     $('#pdc-product-file-upload').on('click', openMediaDialogFromOrder);
     $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
   });

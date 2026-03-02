@@ -759,10 +759,10 @@ class AdminCore {
 
 		$pdc_pod_index = isset( $index ) ? intval( $index ) : 0;
 
-		$pdc_pod_parent_sku       = get_post_meta( $pdc_pod_parent_id, $pdc_pod_meta_key_sku, true );
-		$pdc_pod_variantion_sku       = get_post_meta( $pdc_pod_variation_id, $pdc_pod_meta_key_sku, true );
-		$pdc_pod_sku = ! empty($pdc_pod_variantion_sku) ? $pdc_pod_variantion_sku : $pdc_pod_parent_sku;
-		$pdc_pod_preset_id = get_post_meta( $pdc_pod_variation_id, $pdc_pod_meta_key_preset_id, true );
+		$pdc_pod_parent_sku     = get_post_meta( $pdc_pod_parent_id, $pdc_pod_meta_key_sku, true );
+		$pdc_pod_variantion_sku = get_post_meta( $pdc_pod_variation_id, $pdc_pod_meta_key_sku, true );
+		$pdc_pod_sku            = ! empty( $pdc_pod_variantion_sku ) ? $pdc_pod_variantion_sku : $pdc_pod_parent_sku;
+		$pdc_pod_preset_id      = get_post_meta( $pdc_pod_variation_id, $pdc_pod_meta_key_preset_id, true );
 
 		$pdc_pod_products = $this->pdc_client->search_products();
 
@@ -792,9 +792,9 @@ class AdminCore {
 		}
 
 		$fields = array(
-			'pdf_url'   => $this->get_meta_key( 'pdf_url' ),
-			'product_sku'   => $this->get_meta_key( 'product_sku' ),
-			'preset_id' => $this->get_meta_key( 'preset_id' ),
+			'pdf_url'     => $this->get_meta_key( 'pdf_url' ),
+			'product_sku' => $this->get_meta_key( 'product_sku' ),
+			'preset_id'   => $this->get_meta_key( 'preset_id' ),
 		);
 
 		foreach ( $fields as $meta_key ) {

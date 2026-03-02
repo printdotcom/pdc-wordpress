@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @var $pdc_pod_meta_key_preset_id string
  */
 $pdc_pod_preset_input_name = $pdc_pod_meta_key_preset_id . '[' . $pdc_pod_index . ']';
-$pdc_pod_sku_input_name = $pdc_pod_meta_key_sku . '[' . $pdc_pod_index . ']';
+$pdc_pod_sku_input_name    = $pdc_pod_meta_key_sku . '[' . $pdc_pod_index . ']';
 
 wp_nonce_field(
 	PDC_POD_NAME . '_save_variations' . $pdc_pod_index,
@@ -36,16 +36,19 @@ wp_nonce_field(
 <div class="form-row">
 	<div class="options_group pdc_product_options" id="js-pdc-variant-<?php echo esc_attr( $pdc_pod_variation_id ); ?>">
 		<p class="form-row form-field">
-			<label for="js-pdc-product-selector"><?php esc_html_e( 'Print.com SKU', 'pdc-pod' ); ?></label>
+			<label for="js-pdc-variant-product-<?php echo esc_attr( $pdc_pod_variation_id ); ?>"><?php esc_html_e( 'Print.com SKU', 'pdc-pod' ); ?></label>
 			<select
-				id="js-pdc-product-selector"
+				class="js-pdc-product-selector"
+				data-product_id="<?php echo $pdc_pod_variation_id; ?>"
+				id="js-pdc-variant-product-<?php echo esc_attr( $pdc_pod_variation_id ); ?>"
 				data-testid="pdc-product-sku"
 				name="<?php echo esc_attr( $pdc_pod_sku_input_name ); ?>"
 				value="<?php echo esc_attr( (string) $pdc_pod_sku ); ?>">
 				<option disabled selected value><?php esc_html_e( 'Choose a product', 'pdc-pod' ); ?></option>
-				<?php foreach ( $pdc_pod_products as $pdc_pod ) { 
-					$title = isset($pdc_pod->title) ? $pdc_pod->title : '';
-					$sku = isset($pdc_pod->sku) ? $pdc_pod->sku : '';
+				<?php
+				foreach ( $pdc_pod_products as $pdc_pod ) {
+					$title = isset( $pdc_pod->title ) ? $pdc_pod->title : '';
+					$sku   = isset( $pdc_pod->sku ) ? $pdc_pod->sku : '';
 					?>
 					<option value="<?php echo esc_attr( $sku ); ?>" <?php selected( $sku, $pdc_pod_sku ); ?>><?php echo esc_attr( $title ); ?></option>
 				<?php } ?>
@@ -55,8 +58,13 @@ wp_nonce_field(
 			<label><?php esc_html_e( 'Print.com Preset', 'pdc-pod' ); ?></label>
 			<span class="woocommerce-help-tip" tabindex="0" aria-label="<?php echo esc_attr__( 'Select a preset for this variant. When no preset is selected, it will use the default preset of this product.', 'pdc-pod' ); ?>"></span>
 			<span class="pdc-ac-preset-list">
-				<select data-testid="<?php echo esc_attr( 'variation_preset_' . $pdc_pod_variation_id ); ?>" class="pdc_variation_preset_select" name="<?php echo esc_attr( $pdc_pod_preset_input_name ); ?>" data-current-value="<?php echo esc_attr( $pdc_pod_preset_id ); ?>" value="<?php echo esc_attr( $pdc_pod_preset_id ); ?>">
-					<?php include plugin_dir_path( __FILE__ ) . PDC_POD_NAME . '-admin-preset-select.php'; ?>
+				<select
+					data-testid="<?php echo esc_attr( 'variation_preset_' . $pdc_pod_variation_id ); ?>" 
+					class="pdc_variation_preset_select js-pdc-preset-list-<?php echo esc_attr( $pdc_pod_variation_id ); ?>"
+					name="<?php echo esc_attr( $pdc_pod_preset_input_name ); ?>"
+					data-current-value="<?php echo esc_attr( $pdc_pod_preset_id ); ?>"
+					value="<?php echo esc_attr( $pdc_pod_preset_id ); ?>">
+					<?php require plugin_dir_path( __FILE__ ) . PDC_POD_NAME . '-admin-preset-select.php'; ?>
 				</select>
 			</span>
 		</p>

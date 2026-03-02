@@ -32,6 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<select
 				id="js-pdc-product-selector"
 				data-testid="pdc-product-sku"
+				data-product_id="<?php echo $post->ID; ?>"
 				name="<?php echo esc_attr( $this->get_meta_key( 'product_sku' ) ); ?>"
 				value="<?php echo esc_attr( (string) $pdc_pod_sku ); ?>">
 				<option disabled selected value><?php esc_html_e( 'Choose a product', 'pdc-pod' ); ?></option>
@@ -43,7 +44,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<p class="form-field">
 			<label for="pdc-presets-label"><?php esc_html_e( 'Print.com Preset', 'pdc-pod' ); ?></label>
 			<span class="pdc-ac-preset-list">
-				<select id="js-pdc-preset-list" class="pdc_preset_select" name="<?php echo esc_attr( $preset_input_name ); ?>" data-testid="pdc-preset-id"  data-current-value="<?php echo esc_attr( $pdc_pod_preset_id ); ?>" value="<?php echo esc_attr( (string) $pdc_pod_preset_id ); ?>">
+				<select
+					id="js-pdc-preset-list"
+					class="pdc_preset_select js-pdc-preset-list-<?php echo esc_attr( $post->ID ); ?>"
+					name="<?php echo esc_attr( $preset_input_name ); ?>" data-testid="pdc-preset-id"  data-current-value="<?php echo esc_attr( $pdc_pod_preset_id ); ?>" value="<?php echo esc_attr( (string) $pdc_pod_preset_id ); ?>">
 					<?php require plugin_dir_path( __FILE__ ) . '/' . PDC_POD_NAME . '-admin-preset-select.php'; ?>
 				</select>
 			</span>
