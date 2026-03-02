@@ -41,7 +41,7 @@ wp_nonce_field(
 				class="js-pdc-product-selector"
 				data-product_id="<?php echo $pdc_pod_variation_id; ?>"
 				id="js-pdc-variant-product-<?php echo esc_attr( $pdc_pod_variation_id ); ?>"
-				data-testid="pdc-product-sku"
+				data-testid="<?php echo esc_attr( 'variation_sku_' . $pdc_pod_variation_id ); ?>" 
 				name="<?php echo esc_attr( $pdc_pod_sku_input_name ); ?>"
 				value="<?php echo esc_attr( (string) $pdc_pod_sku ); ?>">
 				<option disabled selected value><?php esc_html_e( 'Choose a product', 'pdc-pod' ); ?></option>

@@ -87,4 +87,36 @@ test.describe('product', () => {
     // save variation
     await page.getByRole('button', { name: 'Save changes' }).click();
   });
+
+  test('can configure a different sku for a variation', async ({ page }) => {
+    await page.goto('/wp-admin/post.php?post=15&action=edit');
+    await page.getByRole('link', { name: 'Print.com' }).click();
+    
+    // set main product to posters
+    await page.getByTestId('pdc-product-sku').selectOption('posters');
+    await page.locator('a[href="#variable_product_options"]').click();
+
+    // open A3
+    const tableRow = page
+      .locator('.woocommerce_variation.wc-metabox')
+      .filter({ has: page.locator('a.remove_variation[rel="16"]') })
+      .first();
+
+    await tableRow.locator('a.edit_variation.edit').click();
+    const panel = tableRow.locator('.woocommerce_variable_attributes.wc-metabox-content').first();
+
+    // sku can be entered
+    await expect(panel.getByTestId('variation_sku_16')).toBeVisible();
+
+    // switching sku should make a request to retrieve new presets
+    await Promise.all([
+      page.getByTestId('variation_sku_16').selectOption('flyers'),
+      page.waitForResponse((r) => r.ok() && r.url().includes('rest_route=/pdc/v1/products/flyers/presets')),
+    ]);
+
+    await page.getByTestId('variation_preset_16').selectOption('flyers_a5');
+
+    // save variation
+    await page.getByRole('button', { name: 'Save changes' }).click();
+  });
 });
