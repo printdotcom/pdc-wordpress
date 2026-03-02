@@ -47,17 +47,12 @@ class APIClient {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-
-		$env = get_option( PDC_POD_NAME . '-env' );
-
-		// Allow environment variable override for testing.
 		if ( getenv( 'PDC_POD_API_BASE_URL' ) ) {
 			$this->pdc_pod_api_base_url = getenv( 'PDC_POD_API_BASE_URL' );
 		} else {
+			$env                        = get_option( PDC_POD_NAME . '-env' );
 			$this->pdc_pod_api_base_url = ( 'prod' === $env ) ? 'https://api.print.com' : 'https://api.stg.print.com';
 		}
-
-		// Allow environment variable override for testing.
 		if ( getenv( 'PDC_POD_API_KEY' ) ) {
 			$this->pdc_pod_api_key = getenv( 'PDC_POD_API_KEY' );
 		} else {

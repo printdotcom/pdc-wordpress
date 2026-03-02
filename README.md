@@ -104,8 +104,6 @@ This project follows:
 - [Conventional Commits](https://www.conventionalcommits.org/) for commit messages
 
 
-
-
 ### Translations
 
 #### When a new translation is added
@@ -195,6 +193,13 @@ The project uses PSR-4 autoloading via Composer:
     }
   }
 }
+```
+
+### Unit tests
+
+Running automated unit tests via phpunit is possible through:
+```bash
+bin/test-unit
 ```
 
 ### Mock API
