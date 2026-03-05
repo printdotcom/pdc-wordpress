@@ -112,8 +112,10 @@ class Test_APIClient extends TestCase {
 		$body = json_encode( [
 			'items' => [
 				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster B1' ], 'id' => '1' ],
-				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A1' ], 'id' => '2' ],
-				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A0' ], 'id' => '3' ],
+				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A2' ], 'id' => '2' ],
+				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A10' ], 'id' => '3' ],
+				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A1' ], 'id' => '4' ],
+				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A0' ], 'id' => '5' ],
 			],
 		] );
 
@@ -127,7 +129,9 @@ class Test_APIClient extends TestCase {
 
 		$this->assertEquals( 'Poster A0', $presets[0]->title );
 		$this->assertEquals( 'Poster A1', $presets[1]->title );
-		$this->assertEquals( 'Poster B1', $presets[2]->title );
+		$this->assertEquals( 'Poster A2', $presets[2]->title );
+		$this->assertEquals( 'Poster A10', $presets[3]->title );
+		$this->assertEquals( 'Poster B1', $presets[4]->title );
 
 		putenv( 'PDC_POD_API_BASE_URL' );
 		putenv( 'PDC_POD_API_KEY' );

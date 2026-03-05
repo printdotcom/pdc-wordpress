@@ -196,7 +196,7 @@ class APIClient {
 
 		usort(
 			$filtered_by_sku,
-			fn( $a, $b ) => strcasecmp( $a->title, $b->title )
+			fn( $a, $b ) => strnatcasecmp( $a->title, $b->title )
 		);
 
 		return array_values( $filtered_by_sku );
