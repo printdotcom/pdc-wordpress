@@ -98,4 +98,42 @@ class Test_APIClient extends TestCase {
 
 		$this->assertEquals( 'https://api.stg.print.com', $client->get_api_base_url() );
 	}
+
+
+    /**
+	 * Ensures that presets are sorted by title
+	 *
+	 * @since 1.0.1
+	 */
+	public function test_sorts_presets_by_title() {
+		putenv( 'PDC_POD_API_BASE_URL=https://testapi.print.com' );
+		putenv( 'PDC_POD_API_KEY=fake-key' );
+
+		$body = json_encode( [
+			'items' => [
+				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster B1' ], 'id' => '1' ],
+				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A2' ], 'id' => '2' ],
+				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A10' ], 'id' => '3' ],
+				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A1' ], 'id' => '4' ],
+				[ 'sku' => 'test-posters', 'title' => [ 'en' => 'Poster A0' ], 'id' => '5' ],
+			],
+		] );
+
+		WP_Mock::userFunction( 'wp_remote_request', [ 'return' => [] ] );
+		WP_Mock::userFunction( 'is_wp_error', [ 'return' => false ] );
+		WP_Mock::userFunction( 'wp_remote_retrieve_response_code', [ 'return' => 200 ] );
+		WP_Mock::userFunction( 'wp_remote_retrieve_body', [ 'return' => $body ] );
+
+		$client  = new APIClient();
+		$presets = $client->get_presets( 'test-posters' );
+
+		$this->assertEquals( 'Poster A0', $presets[0]->title );
+		$this->assertEquals( 'Poster A1', $presets[1]->title );
+		$this->assertEquals( 'Poster A2', $presets[2]->title );
+		$this->assertEquals( 'Poster A10', $presets[3]->title );
+		$this->assertEquals( 'Poster B1', $presets[4]->title );
+
+		putenv( 'PDC_POD_API_BASE_URL' );
+		putenv( 'PDC_POD_API_KEY' );
+	}
 }

@@ -4,7 +4,7 @@ Donate link: https://print.com
 Tags: woocommerce
 Requires at least: 3.4
 Tested up to: 6.9
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,6 +39,10 @@ Unfortunately we cannot store prices as they change every week. This might be a 
 We have a more information in our knowledge base at https://knowledge.print.com/nl/helpcenter/solutions#print-on-demand-plugin-woocommerce.
 
 == Changelog ==
+
+= 1.1.1 =
+
+* fix: sort presets alphabetically
 
 = 1.1.0 =
 
