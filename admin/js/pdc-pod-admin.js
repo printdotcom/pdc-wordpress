@@ -132,6 +132,36 @@
     }
   }
 
+  async function downloadLogs(e) {
+    e.preventDefault();
+    const btn = $(`#js-${PLUGIN_NAME}-download-logs`);
+    btn.prop('disabled', true);
+    try {
+      const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/download-logs`, {
+        method: 'POST',
+        headers: {
+          'X-WP-Nonce': PDC_POD_ADMIN.nonce,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to download logs');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pdc-pod-log.log';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    } catch (err) {
+      alert('Failed to download logs: ' + err.message);
+    } finally {
+      btn.prop('disabled', false);
+    }
+  }
+
   let formIsDirty = false;
   function observeFormChanges(formID) {
     const formElement = $(formID);
@@ -146,6 +176,7 @@
     $('#pdc-file-upload').on('click', orderItemAttachPdf);
     $('#pdc-order').on('click', purchaseOrderItem);
     $(`#js-${PLUGIN_NAME}-verify_key`).click(checkCredentials);
+    $(`#js-${PLUGIN_NAME}-download-logs`).on('click', downloadLogs);
     observeFormChanges(`#js-${PLUGIN_NAME}-general-form`);
   });
 
