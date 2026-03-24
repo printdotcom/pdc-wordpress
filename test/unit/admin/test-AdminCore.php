@@ -136,9 +136,7 @@ class Test_AdminCore extends TestCase
             ->with($stored_pdf_url, $order_item_id)
             ->reply($filtered_pdf_url);
 
-        $mock_client = $this->getMockBuilder('PdcPod\Admin\PrintDotCom\APIClient')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mock_client = \Mockery::mock('PdcPod\Admin\PrintDotCom\APIClient');
 
         $admin_core = new AdminCore($mock_client);
 
@@ -170,9 +168,7 @@ class Test_AdminCore extends TestCase
             ->with($stored_pdf_url, $order_item_id)
             ->reply($stored_pdf_url);
 
-        $mock_client = $this->getMockBuilder('PdcPod\Admin\PrintDotCom\APIClient')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mock_client = \Mockery::mock('PdcPod\Admin\PrintDotCom\APIClient');
 
         $admin_core = new AdminCore($mock_client);
 
