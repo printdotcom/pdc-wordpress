@@ -69,6 +69,7 @@ class Core {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
+		$this->define_compatibility_hooks();
 	}
 
 	/**
@@ -95,12 +96,6 @@ class Core {
 	/**
 	 * Load the required dependencies for this plugin.
 	 *
-	 * Include the following files that make up the plugin:
-	 *
-	 * - Pdc_Pod_Loader. Orchestrates the hooks of the plugin.
-	 * - Pdc_Pod_I18n. Defines internationalization functionality.
-	 * - Pdc_Pod_Admin. Defines all hooks for the admin area.
-	 * - Pdc_Pod_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -168,6 +163,18 @@ class Core {
 		$this->loader->add_filter( 'woocommerce_add_cart_item_data', $plugin_public, 'capture_cart_item_data', 10, 2 );
 		$this->loader->add_filter( 'woocommerce_before_add_to_cart_button', $plugin_public, 'add_cart_item_data_nonce', 10, 2 );
 		$this->loader->add_filter( 'woocommerce_checkout_create_order_line_item', $plugin_public, 'save_pdc_values_order_meta', 80, 4 );
+	}
+
+	/**
+	 * Register all of the hooks related to compatibility functionality.
+	 *
+	 * @since    1.2.0
+	 * @access   private
+	 */
+	private function define_compatibility_hooks() {
+		$print_app = new Compatibility\PrintApp();
+
+		$this->loader->add_action( 'plugins_loaded', $print_app, 'init' );
 	}
 
 	/**
