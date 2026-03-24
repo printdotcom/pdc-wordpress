@@ -50,7 +50,7 @@ wp_nonce_field(
 					$pdc_pod_product_title = isset( $pdc_pod->title ) ? $pdc_pod->title : '';
 					$pdc_pod_product_sku   = isset( $pdc_pod->sku ) ? $pdc_pod->sku : '';
 					?>
-					<option value="<?php echo esc_attr( $pdc_pod_product_sku ); ?>" <?php selected( $pdc_pod_product_sku, $pdc_pod_sku ); ?>><?php echo esc_attr( $pdc_pod_product_title ); ?></option>
+					<option value="<?php echo esc_attr( $pdc_pod_product_sku ); ?>" <?php selected( $pdc_pod_product_sku, $pdc_pod_sku ); ?>><?php echo esc_html( $pdc_pod_product_title ); ?></option>
 				<?php } ?>
 			</select>
 		</p>
