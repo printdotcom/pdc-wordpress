@@ -266,6 +266,7 @@ class AdminCore {
 		 */
 		return apply_filters( 'pdc_pod_order_item_pdf_url', $pdf_url, $pdc_pod_order_item_id );
 	}
+
 	/**
 	 * Registers order metaboxes for various WooCommerce screens.
 	 *
@@ -704,9 +705,16 @@ class AdminCore {
 			);
 		}
 
+		$order_item = new \WC_Order_Item_Product( $order_item_id );
+		$order_id   = wc_get_order_id_by_order_item_id( $order_item_id );
+		$order      = wc_get_order( $order_id );
+
+		$pdc_pod_preset_id  = wc_get_order_item_meta( $order_item_id, $this->get_meta_key( 'preset_id' ), true );
+		$pdc_pod_preset_url = $this->get_pdf_url_by_order_item_id( $order_item_id );
+
 		$pdc_product_config = get_option( PDC_POD_NAME . '-product' );
 
-		$result = $this->pdc_client->purchase_order_item( $order_item_id, $pdc_product_config );
+		$result = $this->pdc_client->purchase_order_item( $order, $order_item, $pdc_pod_preset_url, $pdc_pod_preset_id, $pdc_product_config );
 		if ( is_wp_error( $result ) ) {
 			$status = absint( $result->get_error_code() );
 			if ( 0 === $status ) {
@@ -726,7 +734,6 @@ class AdminCore {
 		$pdc_order               = $result->order;
 		$pdc_order_item          = $pdc_order->items[0];
 		$pdc_order_item_shipment = $pdc_order_item->shipments[0];
-		$order_item              = new \WC_Order_Item_Product( $order_item_id );
 
 		$order_item->update_meta_data( $this->get_meta_key( 'order' ), $pdc_order );
 		$order_item->update_meta_data( $this->get_meta_key( 'purchase_date' ), gmdate( 'c' ) );
@@ -745,9 +752,6 @@ class AdminCore {
 		$order_item->update_meta_data( $this->get_meta_key( 'order_item_status' ), $order_item_status );
 		$order_item->update_meta_data( $this->get_meta_key( 'order_item_grand_total' ), $order_item_total );
 		$order_item->save();
-
-		$order_id = wc_get_order_id_by_order_item_id( $order_item_id );
-		$order    = wc_get_order( $order_id );
 
 		$note = sprintf(
 			// translators: placeholder is the order number.
