@@ -118,4 +118,80 @@ class Test_AdminCore extends TestCase
         $admin_core->render_variation_data_fields(0, array(), $variation_post);
         ob_end_clean();
     }
+
+    /**
+     * Tests get_pdf_url_by_order_item_id correctly retrieves the PDF URL
+     * and applies the 'pdc_pod_order_item_pdf_url' filter.
+     *
+     * @since 1.2.0
+     */
+    function test_get_pdf_url_by_order_item_id_applies_filter()
+    {
+        $order_item_id = 999;
+        $meta_key_pdf_url = '_pdc-pod_pdf_url';
+        $stored_pdf_url = 'https://example.com/original.pdf';
+        $filtered_pdf_url = 'https://example.com/filtered.pdf';
+
+        WP_Mock::userFunction('wc_get_order_item_meta', array(
+            'times' => 1,
+            'args' => array($order_item_id, $meta_key_pdf_url, true),
+            'return' => $stored_pdf_url,
+        ));
+
+        WP_Mock::onFilter('pdc_pod_order_item_pdf_url')
+            ->with($stored_pdf_url, $order_item_id)
+            ->reply($filtered_pdf_url);
+
+        $mock_client = $this->getMockBuilder('PdcPod\Admin\PrintDotCom\APIClient')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $admin_core = new AdminCore($mock_client);
+
+        // Access the private get_pdf_url_by_order_item_id method
+        $reflection = new \ReflectionMethod(AdminCore::class, 'get_pdf_url_by_order_item_id');
+        $reflection->setAccessible(true);
+
+        $result = $reflection->invoke($admin_core, $order_item_id);
+
+        $this->assertEquals($filtered_pdf_url, $result);
+    }
+
+    /**
+     * Tests get_pdf_url_by_order_item_id correctly retrieves the PDF URL
+     * when the 'pdc_pod_order_item_pdf_url' filter doesn't change it.
+     *
+     * @since 1.2.0
+     */
+    function test_get_pdf_url_by_order_item_id_no_filter_change()
+    {
+        $order_item_id = 1000;
+        $meta_key_pdf_url = '_pdc-pod_pdf_url';
+        $stored_pdf_url = 'https://example.com/unfiltered.pdf';
+
+        WP_Mock::userFunction('wc_get_order_item_meta', array(
+            'times' => 1,
+            'args' => array($order_item_id, $meta_key_pdf_url, true),
+            'return' => $stored_pdf_url,
+        ));
+
+        // Let the filter pass the value through unchanged (which is the default WP behavior when no filter is attached)
+        WP_Mock::onFilter('pdc_pod_order_item_pdf_url')
+            ->with($stored_pdf_url, $order_item_id)
+            ->reply($stored_pdf_url);
+
+        $mock_client = $this->getMockBuilder('PdcPod\Admin\PrintDotCom\APIClient')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $admin_core = new AdminCore($mock_client);
+
+        // Access the private get_pdf_url_by_order_item_id method
+        $reflection = new \ReflectionMethod(AdminCore::class, 'get_pdf_url_by_order_item_id');
+        $reflection->setAccessible(true);
+
+        $result = $reflection->invoke($admin_core, $order_item_id);
+
+        $this->assertEquals($stored_pdf_url, $result);
+    }
 }
