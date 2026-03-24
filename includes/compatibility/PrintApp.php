@@ -46,16 +46,6 @@ class PrintApp {
 	public function __construct() {}
 
 	/**
-	 * Register hooks for Print.app compatibility.
-	 *
-	 * @since    1.2.0
-	 * @return   void
-	 */
-	public function init() {
-		add_filter( 'pdc_pod_order_item_pdf_url', array( $this, 'get_print_app_pdf_url' ), 10, 2 );
-	}
-
-	/**
 	 * Retrieves the PDF URL from Print.app if available.
 	 *
 	 * @since 1.2.0

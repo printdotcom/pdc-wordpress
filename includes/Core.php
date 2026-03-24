@@ -173,7 +173,7 @@ class Core {
 	private function define_compatibility_hooks() {
 		$print_app = new Compatibility\PrintApp();
 
-		$this->loader->add_action( 'plugins_loaded', $print_app, 'init' );
+		$this->loader->add_filter( 'pdc_pod_order_item_pdf_url', $print_app, 'get_print_app_pdf_url', 10, 2 );
 	}
 
 	/**
