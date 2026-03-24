@@ -120,12 +120,9 @@ class Test_AdminCore extends TestCase
     }
 
     /**
-     * Tests get_pdf_url_by_order_item_id correctly retrieves the PDF URL
-     * and applies the 'pdc_pod_order_item_pdf_url' filter.
-     *
-     * @since 1.2.0
+     * @testdox get_pdf_url_by_order_item_id()
      */
-    function test_get_pdf_url_by_order_item_id_applies_filter()
+    public function test_get_pdf_url_by_order_item_id_applies_filter()
     {
         $order_item_id = 999;
         $meta_key_pdf_url = '_pdc-pod_pdf_url';
@@ -158,12 +155,9 @@ class Test_AdminCore extends TestCase
     }
 
     /**
-     * Tests get_pdf_url_by_order_item_id correctly retrieves the PDF URL
-     * when the 'pdc_pod_order_item_pdf_url' filter doesn't change it.
-     *
-     * @since 1.2.0
+     * @testdox get_pdf_url_by_order_item_id() when the filter doesn't change the value
      */
-    function test_get_pdf_url_by_order_item_id_no_filter_change()
+    public function test_get_pdf_url_by_order_item_id_no_filter_change()
     {
         $order_item_id = 1000;
         $meta_key_pdf_url = '_pdc-pod_pdf_url';
