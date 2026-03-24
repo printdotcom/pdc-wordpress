@@ -332,12 +332,20 @@ class APIClient {
 		unset( $item_options->variants );
 		unset( $item_options->deliveryPromise ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
-		$restapi_url   = esc_url_raw( rest_url() );
 		$order_item_id = $order_item->get_id();
 		$order_id      = $order->get_id();
+
+		$webhook_url = add_query_arg(
+			array(
+				'order_item_id' => $order_item_id,
+				'order_id'      => $order_id,
+			),
+			rest_url( 'pdc/v1/orders/webhook' )
+		);
+
 		$order_request = array(
 			'customerReference' => $order->get_order_number() . '-' . $order_item_id,
-			'webhookUrl'        => $restapi_url . 'pdc/v1/orders/webhook?order_item_id=' . $order_item_id . '&order_id=' . $order_id,
+			'webhookUrl'        => esc_url_raw( $webhook_url ),
 			'items'             => array(
 				array(
 					'sku'           => $preset->sku,
