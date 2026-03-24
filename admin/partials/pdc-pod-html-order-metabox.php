@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$pdc_pod_order_item_grand_total = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'order_item_grand_total' ), true );
 			$pdc_pod_purchase_date          = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'purchase_date' ), true );
 			$pdc_pod_image_url              = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'image_url' ), true );
-			$pdc_pod_pdf_url                = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'pdf_url' ), true );
+			$pdc_pod_pdf_url                = $this->get_pdf_url_by_order_item_id( $pdc_pod_order_item_id );
 			$pdc_pod_order_item_status      = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'order_item_status' ), true );
 			$pdc_pod_tnt_url                = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'order_item_tnt_url' ), true );
 			$pdc_pod_preset_id              = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'preset_id' ), true );

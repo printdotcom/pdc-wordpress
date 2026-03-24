@@ -272,40 +272,37 @@ class APIClient {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int   $order_item_id The WooCommerce order item ID to purchase.
-	 * @param array $args {
+	 * @param \WC_Order              $order              The WooCommerce order.
+	 * @param \WC_Order_Item_Product $order_item         The WooCommerce order item.
+	 * @param string                 $pdc_pod_preset_url The PDF URL for the print item.
+	 * @param string                 $pdc_pod_preset_id  The Print.com preset ID.
+	 * @param array                  $args {
 	 *     Optional. Arguments for customizing the purchase behavior.
 	 *
 	 *     @type bool $use_preset_copies Whether to use preset-defined copy count.
 	 *                                   If false, uses order item quantity. Default true.
 	 * }
 	 *
-	 * @return object|WP_Error Returns the Print.com order response object on success,
-	 *                         or WP_Error on failure with error details.
+	 * @return object|\WP_Error Returns the Print.com order response object on success,
+	 *                         or \WP_Error on failure with error details.
 	 *
 	 * @phpcsSuppress WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 	 */
-	public function purchase_order_item( $order_item_id, $args ) {
-		$order_item       = new \WC_Order_Item_Product( $order_item_id );
-		$order_id         = wc_get_order_id_by_order_item_id( $order_item_id );
-		$order            = wc_get_order( $order_id );
+	public function purchase_order_item( $order, $order_item, $pdc_pod_preset_url, $pdc_pod_preset_id, $args = array() ) {
 		$shipping_address = $order->get_address( 'shipping' );
 
 		if ( empty( $shipping_address ) ) {
 			return new \WP_Error( 400, 'No shipping address found', array( 'order' => $order ) );
 		}
 
-		$pdc_preset_id = wc_get_order_item_meta( $order_item_id, Core::get_meta_key( 'preset_id' ), true );
-		$pdc_pdf_url   = wc_get_order_item_meta( $order_item_id, Core::get_meta_key( 'pdf_url' ), true );
-
-		$result = $this->perform_authenticated_request( 'GET', '/customerpresets/' . rawurlencode( $pdc_preset_id ), null );
+		$result = $this->perform_authenticated_request( 'GET', '/customerpresets/' . rawurlencode( $pdc_pod_preset_id ), null );
 		if ( is_wp_error( $result ) ) {
 			if ( $result->get_error_message() === '[404] Preset not found.' ) {
 				return new \WP_Error(
 					404,
 					'Preset does not exist.',
 					array(
-						'preset_id'   => $pdc_preset_id,
+						'preset_id'   => $pdc_pod_preset_id,
 						'environment' => $this->pdc_pod_api_base_url,
 					)
 				);
@@ -317,7 +314,7 @@ class APIClient {
 				404,
 				'Preset does not exist.',
 				array(
-					'preset_id'   => $pdc_preset_id,
+					'preset_id'   => $pdc_pod_preset_id,
 					'environment' => $this->pdc_pod_api_base_url,
 				)
 			);
@@ -335,14 +332,24 @@ class APIClient {
 		unset( $item_options->variants );
 		unset( $item_options->deliveryPromise ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
-		$restapi_url   = esc_url_raw( rest_url() );
+		$order_item_id = $order_item->get_id();
+		$order_id      = $order->get_id();
+
+		$webhook_url = add_query_arg(
+			array(
+				'order_item_id' => $order_item_id,
+				'order_id'      => $order_id,
+			),
+			rest_url( 'pdc/v1/orders/webhook' )
+		);
+
 		$order_request = array(
 			'customerReference' => $order->get_order_number() . '-' . $order_item_id,
-			'webhookUrl'        => $restapi_url . 'pdc/v1/orders/webhook?order_item_id=' . $order_item_id . '&order_id=' . $order_id,
+			'webhookUrl'        => esc_url_raw( $webhook_url ),
 			'items'             => array(
 				array(
 					'sku'           => $preset->sku,
-					'fileUrl'       => $pdc_pdf_url,
+					'fileUrl'       => $pdc_pod_preset_url,
 					'options'       => $item_options,
 					'approveDesign' => true,
 					'shipments'     => array(
