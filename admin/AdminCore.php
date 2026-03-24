@@ -240,7 +240,32 @@ class AdminCore {
 		$order = wc_get_order( $post->get_ID() );
 		include plugin_dir_path( __FILE__ ) . 'partials/' . PDC_POD_NAME . '-html-order-metabox.php';
 	}
+	
+	/**
+	 * Retrieves the PDF URL for a specific order item.
+	 *
+	 * This method checks for a PDF URL in the order item metadata.
+	 * It also provides a filter to allow external overrides of the URL.
+	 *
+	 * @since 1.2.0
+	 * @param int $pdc_pod_order_item_id The WooCommerce order item ID.
+	 * @return string|bool The PDF URL if found, or false.
+	 */
+	private function get_pdf_url_by_order_item_id( $pdc_pod_order_item_id ) {		
+		$pdf_url = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'pdf_url' ), true );
 
+		/**
+		 * Filter the PDF URL for an order item.
+		 *
+		 * This allows developers to override the PDF URL retrieval logic
+		 * for specific order items.
+		 *
+		 * @since 1.2.0
+		 * @param string|bool $pdf_url      The PDF URL, or false if not found.
+		 * @param int         $order_item_id The WooCommerce order item ID.
+		 */
+		return apply_filters( 'pdc_pod_order_item_pdf_url', $pdf_url, $pdc_pod_order_item_id );
+	}
 	/**
 	 * Registers order metaboxes for various WooCommerce screens.
 	 *
