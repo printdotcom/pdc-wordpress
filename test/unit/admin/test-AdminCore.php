@@ -50,10 +50,7 @@ class Test_AdminCore extends TestCase
         $meta_key_sku = '_pdc-pod_product_sku';
         $meta_key_preset_id = '_pdc-pod_preset_id';
 
-        // Create a mock WP_Post object.
-        $variation_post = $this->getMockBuilder('WP_Post')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $variation_post = \Mockery::mock('WP_Post');
         $variation_post->ID = $variation_id;
         $variation_post->post_parent = $parent_id;
 
@@ -147,7 +144,6 @@ class Test_AdminCore extends TestCase
 
         // Access the private get_pdf_url_by_order_item_id method
         $reflection = new \ReflectionMethod(AdminCore::class, 'get_pdf_url_by_order_item_id');
-        $reflection->setAccessible(true);
 
         $result = $reflection->invoke($admin_core, $order_item_id);
 
@@ -182,7 +178,6 @@ class Test_AdminCore extends TestCase
 
         // Access the private get_pdf_url_by_order_item_id method
         $reflection = new \ReflectionMethod(AdminCore::class, 'get_pdf_url_by_order_item_id');
-        $reflection->setAccessible(true);
 
         $result = $reflection->invoke($admin_core, $order_item_id);
 
