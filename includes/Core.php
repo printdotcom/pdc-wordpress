@@ -96,7 +96,6 @@ class Core {
 	/**
 	 * Load the required dependencies for this plugin.
 	 *
-	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
 	 *

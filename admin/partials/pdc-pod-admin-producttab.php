@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<select
 				id="js-pdc-product-selector"
 				data-testid="pdc-product-sku"
-				data-product_id="<?php echo $post->ID; ?>"
+				data-product_id="<?php echo esc_attr( $post->ID ); ?>"
 				name="<?php echo esc_attr( $this->get_meta_key( 'product_sku' ) ); ?>"
 				value="<?php echo esc_attr( (string) $pdc_pod_sku ); ?>">
 				<option disabled selected value><?php esc_html_e( 'Choose a product', 'pdc-pod' ); ?></option>
