@@ -24,7 +24,7 @@
  * Plugin Name:       Print.com Print on Demand
  * Plugin URI:        https://github.com/printdotcom/pdc-pod
  * Description:       Allows customers to configure, edit and purchase products via the Print.com API.
- * Version:           1.1.1
+ * Version:           1.2.0
  * Author:            Print.com
  * Author URI:        https://print.com
  * License:           GPL-2.0+
@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  * @var string PDC_POD_VERSION Plugin version.
  */
-define( 'PDC_POD_VERSION', '1.1.1' );
+define( 'PDC_POD_VERSION', '1.2.0' );
 
 /**
  * Plugin name
