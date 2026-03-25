@@ -39,18 +39,18 @@ wp_nonce_field(
 			<label for="js-pdc-variant-product-<?php echo esc_attr( $pdc_pod_variation_id ); ?>"><?php esc_html_e( 'Print.com SKU', 'pdc-pod' ); ?></label>
 			<select
 				class="js-pdc-product-selector"
-				data-product_id="<?php echo $pdc_pod_variation_id; ?>"
+				data-product_id="<?php echo esc_attr( $pdc_pod_variation_id ); ?>"
 				id="js-pdc-variant-product-<?php echo esc_attr( $pdc_pod_variation_id ); ?>"
-				data-testid="<?php echo esc_attr( 'variation_sku_' . $pdc_pod_variation_id ); ?>" 
+				data-testid="<?php echo 'variation_sku_' . esc_attr( $pdc_pod_variation_id ); ?>" 
 				name="<?php echo esc_attr( $pdc_pod_sku_input_name ); ?>"
 				value="<?php echo esc_attr( (string) $pdc_pod_sku ); ?>">
 				<option disabled selected value><?php esc_html_e( 'Choose a product', 'pdc-pod' ); ?></option>
 				<?php
 				foreach ( $pdc_pod_products as $pdc_pod ) {
-					$title = isset( $pdc_pod->title ) ? $pdc_pod->title : '';
-					$sku   = isset( $pdc_pod->sku ) ? $pdc_pod->sku : '';
+					$pdc_pod_product_title = isset( $pdc_pod->title ) ? $pdc_pod->title : '';
+					$pdc_pod_product_sku   = isset( $pdc_pod->sku ) ? $pdc_pod->sku : '';
 					?>
-					<option value="<?php echo esc_attr( $sku ); ?>" <?php selected( $sku, $pdc_pod_sku ); ?>><?php echo esc_attr( $title ); ?></option>
+					<option value="<?php echo esc_attr( $pdc_pod_product_sku ); ?>" <?php selected( $pdc_pod_product_sku, $pdc_pod_sku ); ?>><?php echo esc_html( $pdc_pod_product_title ); ?></option>
 				<?php } ?>
 			</select>
 		</p>
