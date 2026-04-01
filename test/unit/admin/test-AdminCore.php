@@ -117,6 +117,68 @@ class Test_AdminCore extends TestCase
     }
 
     /**
+     * Provides test cases for sanitize_loglevel.
+     *
+     * Each entry contains: raw input, expected sanitized output.
+     *
+     * @return array<string, array{string, string}>
+     */
+    public function provide_sanitize_loglevel_cases(): array
+    {
+        return [
+            'valid error level'   => ['error', 'error'],
+            'valid none level'    => ['none',  'none'],
+            'valid debug level'   => ['debug', 'debug'],
+            'uppercase ERROR'     => ['ERROR', 'error'],
+            'uppercase DEBUG'     => ['DEBUG', 'debug'],
+            'mixed case None'     => ['None',  'none'],
+            'invalid value info'  => ['info',  'error'],
+            'empty string'        => ['',      'error'],
+        ];
+    }
+
+    /**
+     * Tests that sanitize_loglevel returns the correct value for string input.
+     *
+     * @since 1.2.0
+     * @dataProvider provide_sanitize_loglevel_cases
+     * @testdox sanitize_loglevel() returns '$expected' for string input '$input'
+     *
+     * @param string $input    Raw string input.
+     * @param string $expected Expected sanitized log level.
+     */
+    public function test_sanitize_loglevel_with_string_input(string $input, string $expected): void
+    {
+        WP_Mock::userFunction('sanitize_text_field', [
+            'args'   => [$input],
+            'return' => $input,
+        ]);
+
+        $mock_client = \Mockery::mock('PdcPod\Admin\PrintDotCom\APIClient');
+        $admin_core  = new AdminCore($mock_client);
+
+        $this->assertSame($expected, $admin_core->sanitize_loglevel($input));
+    }
+
+    /**
+     * Tests that sanitize_loglevel returns 'error' for non-string input.
+     *
+     * sanitize_text_field is not called when the value is not a string.
+     *
+     * @since 1.2.0
+     * @testdox sanitize_loglevel() returns 'error' for non-string input
+     */
+    public function test_sanitize_loglevel_returns_default_for_non_string(): void
+    {
+        $mock_client = \Mockery::mock('PdcPod\Admin\PrintDotCom\APIClient');
+        $admin_core  = new AdminCore($mock_client);
+
+        $this->assertSame('error', $admin_core->sanitize_loglevel(null));
+        $this->assertSame('error', $admin_core->sanitize_loglevel([]));
+        $this->assertSame('error', $admin_core->sanitize_loglevel(42));
+    }
+
+    /**
      * @testdox get_pdf_url_by_order_item_id()
      */
     public function test_get_pdf_url_by_order_item_id_applies_filter()
