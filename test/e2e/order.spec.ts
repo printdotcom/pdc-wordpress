@@ -28,8 +28,9 @@ test.describe('Order', () => {
     await page.locator('table.wp-list-table tbody tr:first-child a.order-view').click();
 
     await expect(page.getByTestId('pdc-purchase-orderitem-1')).toBeEnabled();
+    const presetResponsePromise = page.waitForResponse('**/purchase');
     await page.getByTestId('pdc-purchase-orderitem-1').click();
-    await page.waitForResponse('**/purchase');
+    await presetResponsePromise;
 
     await expect(page.getByTestId('pdc-ordered-copies')).toHaveText('Copies 500');
   });
@@ -50,8 +51,9 @@ test.describe('Order', () => {
     await page.locator('table.wp-list-table tbody tr:first-child a.order-view').click();
 
     await expect(page.getByTestId('pdc-purchase-orderitem-1')).toBeEnabled();
+    const responsePromise = page.waitForResponse('**/purchase');
     await page.getByTestId('pdc-purchase-orderitem-1').click();
-    await page.waitForResponse('**/purchase');
+    await responsePromise;
 
     await expect(page.getByTestId('pdc-ordered-copies')).toHaveText('Copies 1');
   });
