@@ -106,7 +106,7 @@
     e.preventDefault();
     if (loading) return;
     loading = true;
-    $('#pdc-order').addClass('button-disabled');
+    $(e.currentTarget).addClass('button-disabled');
     $('#js-pdc-action-spinner').addClass('is-active');
     $('#js-pdc-request-response').text('');
     const orderItemId = e.target.getAttribute('data-order-item-id');
@@ -127,7 +127,7 @@
       $('#js-pdc-request-response').text(err.message || 'Failed to place order.');
     } finally {
       loading = false;
-      $('#pdc-order').removeClass('button-disabled');
+      $(e.currentTarget).removeClass('button-disabled');
       $('#js-pdc-action-spinner').removeClass('is-active');
     }
   }
@@ -251,8 +251,8 @@
     $('#js-pdc-product-selector').on('change', (e) => loadPresetsForSKU(e.target));
     $('#pdc-product-file-upload').on('click', openMediaDialogFromOrder);
     $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
-    $('.js-pdc-file-upload').on('click', orderItemAttachPdf);
-    $('.js-pdc-purchase-orderitem').on('click', purchaseOrderItem);
+    $(document).on('click', '.js-pdc-file-upload', orderItemAttachPdf);
+    $(document).on('click', '.js-pdc-purchase-orderitem', purchaseOrderItem);
     $(`#js-${PLUGIN_NAME}-verify_key`).click(checkCredentials);
     $(`#js-${PLUGIN_NAME}-download-logs`).on('click', downloadLogs);
     observeFormChanges(`#js-${PLUGIN_NAME}-general-form`);
