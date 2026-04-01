@@ -18,9 +18,9 @@ test.describe('Order', () => {
     // view latest order
     await page.locator('table.wp-list-table tbody tr:first-child a.order-view').click();
 
-
-    // purchase it
-    await page.getByTestId('pdc-purchase-orderitem').click();
+    const responsePromise = page.waitForResponse((r) => r.ok() && r.url().includes('/purchase'));
+    await page.getByTestId('pdc-purchase-orderitem-1').click();
+    await responsePromise;
 
     // We have configured a preset with 300 copies (see preset.flyers_a5.json), so should be 500 copies.
     await expect(page.getByTestId('pdc-ordered-copies')).toHaveText('Copies 500');
@@ -39,13 +39,10 @@ test.describe('Order', () => {
 
     await page.goto('/wp-admin/edit.php?post_type=shop_order');
 
-    // view latest order
-    await page.locator('table.wp-list-table tbody tr:first-child a.order-view').click();
+    const responsePromise = page.waitForResponse((r) => r.ok() && r.url().includes('/purchase'));
+    await page.getByTestId('pdc-purchase-orderitem-1').click();
+    await responsePromise;
 
-    // purchase it
-    await page.getByTestId('pdc-purchase-orderitem').click();
-
-    // quanity = 1 so makes 1 copy
     await expect(page.getByTestId('pdc-ordered-copies')).toHaveText('Copies 1');
   });
 });
