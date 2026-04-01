@@ -106,7 +106,7 @@
     e.preventDefault();
     if (loading) return;
     loading = true;
-    $('#pdc-order').addClass('button-disabled');
+    $(e.currentTarget).addClass('button-disabled');
     $('#js-pdc-action-spinner').addClass('is-active');
     $('#js-pdc-request-response').text('');
     const orderItemId = e.target.getAttribute('data-order-item-id');
@@ -127,8 +127,38 @@
       $('#js-pdc-request-response').text(err.message || 'Failed to place order.');
     } finally {
       loading = false;
-      $('#pdc-order').removeClass('button-disabled');
+      $(e.currentTarget).removeClass('button-disabled');
       $('#js-pdc-action-spinner').removeClass('is-active');
+    }
+  }
+
+  async function downloadLogs(e) {
+    e.preventDefault();
+    const btn = $(`#js-${PLUGIN_NAME}-download-logs`);
+    btn.prop('disabled', true);
+    try {
+      const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/download-logs`, {
+        method: 'POST',
+        headers: {
+          'X-WP-Nonce': PDC_POD_ADMIN.nonce,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to download logs');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pdc-pod-log.log';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    } catch (err) {
+      alert('Failed to download logs: ' + err.message);
+    } finally {
+      btn.prop('disabled', false);
     }
   }
 
@@ -141,13 +171,6 @@
       formIsDirty = true;
     });
   }
-
-  $(window).load(function () {
-    $('#pdc-file-upload').on('click', orderItemAttachPdf);
-    $('#pdc-order').on('click', purchaseOrderItem);
-    $(`#js-${PLUGIN_NAME}-verify_key`).click(checkCredentials);
-    observeFormChanges(`#js-${PLUGIN_NAME}-general-form`);
-  });
 
   // Upload file button click event for simple products
   function openMediaDialogFromProduct(e) {
@@ -228,5 +251,10 @@
     $('#js-pdc-product-selector').on('change', (e) => loadPresetsForSKU(e.target));
     $('#pdc-product-file-upload').on('click', openMediaDialogFromOrder);
     $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
+    $(document).on('click', '.js-pdc-file-upload', orderItemAttachPdf);
+    $(document).on('click', '.js-pdc-purchase-orderitem', purchaseOrderItem);
+    $(`#js-${PLUGIN_NAME}-verify_key`).click(checkCredentials);
+    $(`#js-${PLUGIN_NAME}-download-logs`).on('click', downloadLogs);
+    observeFormChanges(`#js-${PLUGIN_NAME}-general-form`);
   });
 })(jQuery);

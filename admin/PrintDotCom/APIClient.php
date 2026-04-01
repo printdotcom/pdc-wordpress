@@ -12,6 +12,7 @@
 namespace PdcPod\Admin\PrintDotCom;
 
 use PdcPod\Includes\Core;
+use PdcPod\Includes\Logger;
 
 /**
  * Client to connect to the Print.com API
@@ -158,6 +159,16 @@ class APIClient {
 		$body = wp_remote_retrieve_body( $response );
 
 		if ( $code < 200 || $code >= 300 ) {
+			Logger::log(
+				'Print.com API request failed.',
+				'error',
+				array(
+					'method' => $method,
+					'url'    => $url,
+					'status' => $code,
+					'body'   => $body,
+				)
+			);
 			return new \WP_Error( $code, $body );
 		}
 
@@ -176,6 +187,13 @@ class APIClient {
 	public function get_presets( $sku ) {
 		$result = $this->perform_authenticated_request( 'GET', '/customerpresets' );
 		if ( is_wp_error( $result ) ) {
+			Logger::log(
+				'failed to retrieve customer presets.',
+				'error',
+				array(
+					'sku' => $sku,
+				)
+			);
 			return $result;
 		}
 		$decoded_result = json_decode( $result );
@@ -213,6 +231,11 @@ class APIClient {
 	public function is_authenticated() {
 		$result = $this->perform_authenticated_request( 'GET', '/products' );
 		if ( is_wp_error( $result ) ) {
+			Logger::log(
+				'failed to retrieve products.',
+				'error',
+				array()
+			);
 			return false;
 		}
 		return true;
@@ -294,9 +317,16 @@ class APIClient {
 		if ( empty( $shipping_address ) ) {
 			return new \WP_Error( 400, 'No shipping address found', array( 'order' => $order ) );
 		}
-
 		$result = $this->perform_authenticated_request( 'GET', '/customerpresets/' . rawurlencode( $pdc_pod_preset_id ), null );
 		if ( is_wp_error( $result ) ) {
+			Logger::log(
+				'failed to get preset.',
+				'error',
+				array(
+					'preset_id'   => $pdc_pod_preset_id,
+					'environment' => $this->pdc_pod_api_base_url,
+				)
+			);
 			if ( $result->get_error_message() === '[404] Preset not found.' ) {
 				return new \WP_Error(
 					404,
@@ -382,6 +412,14 @@ class APIClient {
 		);
 
 		if ( is_wp_error( $result ) ) {
+			Logger::log(
+				'failed to purchase order.',
+				'error',
+				array(
+					'requestbody' => $order_body,
+					'environment' => $this->pdc_pod_api_base_url,
+				)
+			);
 			return new \WP_Error( 500, 'failed placing the order', array( 'result' => $result ) );
 		}
 

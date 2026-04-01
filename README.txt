@@ -40,6 +40,11 @@ We have a more information in our knowledge base at https://knowledge.print.com/
 
 == Changelog ==
 
+= 1.3.0 =
+
+* add support settings section
+* added log to file capability
+
 = 1.2.0 =
 
 * feat: added filter to override the pdf url on an order

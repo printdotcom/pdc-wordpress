@@ -2,6 +2,16 @@ import { test, expect } from '@playwright/test';
 import { configureSimpleProduct, orderProduct, setSettings } from './utils';
 
 test.describe('Order', () => {
+  test.afterEach(async ({ page }) => {
+    await page.goto('/wp-admin/edit.php?post_type=shop_order');
+    const selectAll = await page.locator('#cb-select-all-1');
+    if (await selectAll.isVisible()) {
+      await selectAll.check();
+      await page.locator('#bulk-action-selector-top').selectOption('trash');
+      await page.locator('#doaction').click();
+    }
+  });
+
   test('will purchase the preset copies amount when use_preset_copies is true', async ({ page }) => {
     await setSettings(page, {
       apikey: 'test_key_12345',
@@ -15,14 +25,13 @@ test.describe('Order', () => {
 
     await page.goto('/wp-admin/edit.php?post_type=shop_order');
 
-    // view latest order
     await page.locator('table.wp-list-table tbody tr:first-child a.order-view').click();
 
+    await expect(page.getByTestId('pdc-purchase-orderitem-1')).toBeEnabled();
+    const presetResponsePromise = page.waitForResponse('**/purchase');
+    await page.getByTestId('pdc-purchase-orderitem-1').click();
+    await presetResponsePromise;
 
-    // purchase it
-    await page.getByTestId('pdc-purchase-orderitem').click();
-
-    // We have configured a preset with 300 copies (see preset.flyers_a5.json), so should be 500 copies.
     await expect(page.getByTestId('pdc-ordered-copies')).toHaveText('Copies 500');
   });
 
@@ -39,13 +48,13 @@ test.describe('Order', () => {
 
     await page.goto('/wp-admin/edit.php?post_type=shop_order');
 
-    // view latest order
     await page.locator('table.wp-list-table tbody tr:first-child a.order-view').click();
 
-    // purchase it
-    await page.getByTestId('pdc-purchase-orderitem').click();
+    await expect(page.getByTestId('pdc-purchase-orderitem-1')).toBeEnabled();
+    const responsePromise = page.waitForResponse('**/purchase');
+    await page.getByTestId('pdc-purchase-orderitem-1').click();
+    await responsePromise;
 
-    // quanity = 1 so makes 1 copy
     await expect(page.getByTestId('pdc-ordered-copies')).toHaveText('Copies 1');
   });
 });

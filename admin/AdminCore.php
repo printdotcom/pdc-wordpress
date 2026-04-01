@@ -13,6 +13,7 @@ namespace PdcPod\Admin;
 
 use PdcPod\Admin\PrintDotCom\APIClient;
 use PdcPod\Includes\Core;
+use PdcPod\Includes\Logger;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -122,6 +123,12 @@ class AdminCore {
 			array( $this, 'section_product' ),
 			PDC_POD_NAME,
 		);
+		add_settings_section(
+			PDC_POD_NAME . '-support',
+			'Support',
+			array( $this, 'section_support' ),
+			PDC_POD_NAME,
+		);
 	}
 
 	/**
@@ -159,6 +166,16 @@ class AdminCore {
 				'type'              => 'array',
 				'default'           => array( 'use_preset_copies' => false ),
 				'sanitize_callback' => array( $this, 'sanitize_product' ),
+			)
+		);
+		// Log level setting: controls which messages are written to the log.
+		register_setting(
+			PDC_POD_NAME . '-options',
+			PDC_POD_NAME . '-loglevel',
+			array(
+				'type'              => 'string',
+				'default'           => 'error',
+				'sanitize_callback' => array( $this, 'sanitize_loglevel' ),
 			)
 		);
 	}
@@ -251,8 +268,8 @@ class AdminCore {
 	 * @param int $pdc_pod_order_item_id The WooCommerce order item ID.
 	 * @return string|bool The PDF URL if found, or false.
 	 */
-	private function get_pdf_url_by_order_item_id( $pdc_pod_order_item_id ) {
-		$pdf_url = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'pdf_url' ), true );
+	public function get_pdf_url_by_order_item_id( $pdc_pod_order_item_id ) {
+		$pdf_url = wc_get_order_item_meta( $pdc_pod_order_item_id, Core::get_meta_key( 'pdf_url' ), true );
 
 		/**
 		 * Filter the PDF URL for an order item.
@@ -265,6 +282,25 @@ class AdminCore {
 		 * @param int         $order_item_id The WooCommerce order item ID.
 		 */
 		return apply_filters( 'pdc_pod_order_item_pdf_url', $pdf_url, $pdc_pod_order_item_id );
+	}
+
+	public function get_preset_id_by_order_item_id( $pdc_pod_order_item_id ) {
+		$pdc_pod_preset_id              = wc_get_order_item_meta( $pdc_pod_order_item_id, Core::get_meta_key('preset_id' ), true );
+		if ( empty( $pdc_pod_preset_id ) ) {
+			$pdc_pod_order_item_product = new \WC_Order_Item_Product( $pdc_pod_order_item_id );
+			$pdc_pod_variation_id = $pdc_pod_order_item_product->get_variation_id();
+			if ( $pdc_pod_variation_id ) {
+				$pdc_pod_preset_id = get_post_meta( $pdc_pod_variation_id, Core::get_meta_key('preset_id' ), true );
+			}
+
+			if ( empty( $pdc_pod_preset_id ) ) {
+				$pdc_pod_product_id = $pdc_pod_order_item_product->get_product_id();
+				if ( $pdc_pod_product_id ) {
+					$pdc_pod_preset_id = get_post_meta( $pdc_pod_product_id, Core::get_meta_key('preset_id' ), true );
+				}
+			}
+		}
+		return $pdc_pod_preset_id;
 	}
 
 	/**
@@ -352,6 +388,21 @@ class AdminCore {
 	}
 
 	/**
+	 * Sanitizes the log level option value.
+	 *
+	 * Only 'none', 'error', and 'debug' are accepted. Falls back to 'error'.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param mixed $value Raw option value.
+	 * @return string 'none', 'error', or 'debug'.
+	 */
+	public function sanitize_loglevel( $value ) {
+		$val = is_string( $value ) ? strtolower( sanitize_text_field( $value ) ) : '';
+		return in_array( $val, array( 'none', 'error', 'debug' ), true ) ? $val : 'error';
+	}
+
+	/**
 	 * Sanitizes the product configuration option value.
 	 *
 	 * Currently supports:
@@ -391,13 +442,23 @@ class AdminCore {
 	}
 
 	/**
-	 * Creates the product configuration section
+	 * Creates the product configuration section.
 	 *
-	 * @since       1.0.0
-	 * @return      void
+	 * @since 1.0.0
+	 * @return void
 	 */
 	public function section_product() {
 		include plugin_dir_path( __FILE__ ) . 'partials/' . PDC_POD_NAME . '-admin-section-product.php';
+	}
+
+	/**
+	 * Creates the support section.
+	 *
+	 * @since 1.2.0
+	 * @return void
+	 */
+	public function section_support() {
+		include __DIR__ . '/partials/' . PDC_POD_NAME . '-admin-section-support.php';
 	}
 
 	/**
@@ -455,6 +516,17 @@ class AdminCore {
 				'callback'            => array( $this, 'pdc_pod_verify_key' ),
 				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
+		register_rest_route(
+			'pdc/v1',
+			'/download-logs',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'download_logs' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
 				},
 			)
 		);
@@ -709,7 +781,7 @@ class AdminCore {
 		$order_id   = wc_get_order_id_by_order_item_id( $order_item_id );
 		$order      = wc_get_order( $order_id );
 
-		$pdc_pod_preset_id  = wc_get_order_item_meta( $order_item_id, $this->get_meta_key( 'preset_id' ), true );
+		$pdc_pod_preset_id  = $this->get_preset_id_by_order_item_id( $order_item_id );
 		$pdc_pod_preset_url = $this->get_pdf_url_by_order_item_id( $order_item_id );
 
 		$pdc_product_config = get_option( PDC_POD_NAME . '-product' );
@@ -828,8 +900,6 @@ class AdminCore {
 
 		foreach ( $fields as $meta_key ) {
 			if ( isset( $_POST[ $meta_key ] ) && isset( $_POST[ $meta_key ][ $i ] ) ) {
-
-				// We capture the raw data to check its type.
 				if ( is_array( $_POST[ $meta_key ][ $i ] ) ) {
 					$val = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $meta_key ][ $i ] ) );
 				} else {
@@ -839,5 +909,10 @@ class AdminCore {
 				update_post_meta( $variation_id, $meta_key, $val );
 			}
 		}
+	}
+
+	public function download_logs() {
+		$logger = Logger::get_instance();
+		$logger->download_log();
 	}
 }
