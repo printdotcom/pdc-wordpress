@@ -172,14 +172,6 @@
     });
   }
 
-  $(window).load(function () {
-    $('.js-pdc-file-upload').on('click', orderItemAttachPdf);
-    $('.js-pdc-purchase-orderitem').on('click', purchaseOrderItem);
-    $(`#js-${PLUGIN_NAME}-verify_key`).click(checkCredentials);
-    $(`#js-${PLUGIN_NAME}-download-logs`).on('click', downloadLogs);
-    observeFormChanges(`#js-${PLUGIN_NAME}-general-form`);
-  });
-
   // Upload file button click event for simple products
   function openMediaDialogFromProduct(e) {
     openMediaDialog(e, function (attachment) {
@@ -259,5 +251,10 @@
     $('#js-pdc-product-selector').on('change', (e) => loadPresetsForSKU(e.target));
     $('#pdc-product-file-upload').on('click', openMediaDialogFromOrder);
     $('.pdc-pod-js-upload-custom-file-btn').on('click', openMediaDialogFromProduct);
+    $('.js-pdc-file-upload').on('click', orderItemAttachPdf);
+    $('.js-pdc-purchase-orderitem').on('click', purchaseOrderItem);
+    $(`#js-${PLUGIN_NAME}-verify_key`).click(checkCredentials);
+    $(`#js-${PLUGIN_NAME}-download-logs`).on('click', downloadLogs);
+    observeFormChanges(`#js-${PLUGIN_NAME}-general-form`);
   });
 })(jQuery);
