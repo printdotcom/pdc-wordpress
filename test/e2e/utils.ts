@@ -9,7 +9,7 @@ export async function orderProduct(page, productSlug: string) {
   await page.locator('#billing_last_name').fill('User');
   await page.getByRole('textbox', { name: 'Street address' }).fill('Teugseweg 18a');
   await page.getByRole('textbox', { name: 'Town / City' }).fill('Deventer');
-  await page.getByRole('textbox', { name: 'ZIP Code' }).fill('63104');
+  await page.locator('#billing_postcode').fill('63104');
   await page.getByRole('textbox', { name: 'Phone' }).fill('0612312312');
   await page.getByRole('button', { name: 'Place order' }).click();
   await page.waitForResponse(/\/?wc-ajax=checkout/);
