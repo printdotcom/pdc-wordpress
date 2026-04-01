@@ -268,8 +268,8 @@ class AdminCore {
 	 * @param int $pdc_pod_order_item_id The WooCommerce order item ID.
 	 * @return string|bool The PDF URL if found, or false.
 	 */
-	private function get_pdf_url_by_order_item_id( $pdc_pod_order_item_id ) {
-		$pdf_url = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'pdf_url' ), true );
+	public function get_pdf_url_by_order_item_id( $pdc_pod_order_item_id ) {
+		$pdf_url = wc_get_order_item_meta( $pdc_pod_order_item_id, Core::get_meta_key( 'pdf_url' ), true );
 
 		/**
 		 * Filter the PDF URL for an order item.
@@ -282,6 +282,25 @@ class AdminCore {
 		 * @param int         $order_item_id The WooCommerce order item ID.
 		 */
 		return apply_filters( 'pdc_pod_order_item_pdf_url', $pdf_url, $pdc_pod_order_item_id );
+	}
+
+	public function get_preset_id_by_order_item_id( $pdc_pod_order_item_id ) {
+		$pdc_pod_preset_id              = wc_get_order_item_meta( $pdc_pod_order_item_id, Core::get_meta_key('preset_id' ), true );
+		if ( empty( $pdc_pod_preset_id ) ) {
+			$pdc_pod_order_item_product = new \WC_Order_Item_Product( $pdc_pod_order_item_id );
+			$pdc_pod_variation_id = $pdc_pod_order_item_product->get_variation_id();
+			if ( $pdc_pod_variation_id ) {
+				$pdc_pod_preset_id = get_post_meta( $pdc_pod_variation_id, Core::get_meta_key('preset_id' ), true );
+			}
+
+			if ( empty( $pdc_pod_preset_id ) ) {
+				$pdc_pod_product_id = $pdc_pod_order_item_product->get_product_id();
+				if ( $pdc_pod_product_id ) {
+					$pdc_pod_preset_id = get_post_meta( $pdc_pod_product_id, Core::get_meta_key('preset_id' ), true );
+				}
+			}
+		}
+		return $pdc_pod_preset_id;
 	}
 
 	/**
@@ -762,7 +781,7 @@ class AdminCore {
 		$order_id   = wc_get_order_id_by_order_item_id( $order_item_id );
 		$order      = wc_get_order( $order_id );
 
-		$pdc_pod_preset_id  = wc_get_order_item_meta( $order_item_id, $this->get_meta_key( 'preset_id' ), true );
+		$pdc_pod_preset_id  = $this->get_preset_id_by_order_item_id( $order_item_id );
 		$pdc_pod_preset_url = $this->get_pdf_url_by_order_item_id( $order_item_id );
 
 		$pdc_product_config = get_option( PDC_POD_NAME . '-product' );

@@ -317,14 +317,13 @@ class APIClient {
 		if ( empty( $shipping_address ) ) {
 			return new \WP_Error( 400, 'No shipping address found', array( 'order' => $order ) );
 		}
-
 		$result = $this->perform_authenticated_request( 'GET', '/customerpresets/' . rawurlencode( $pdc_pod_preset_id ), null );
 		if ( is_wp_error( $result ) ) {
 			Logger::log(
 				'failed to get preset.',
 				'error',
 				array(
-					'preset_id'   => $pdc_preset_id,
+					'preset_id'   => $pdc_pod_preset_id,
 					'environment' => $this->pdc_pod_api_base_url,
 				)
 			);
