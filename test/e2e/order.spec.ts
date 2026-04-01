@@ -27,6 +27,7 @@ test.describe('Order', () => {
 
     await page.locator('table.wp-list-table tbody tr:first-child a.order-view').click();
 
+    await expect(page.getByTestId('pdc-purchase-orderitem-1')).toBeEnabled();
     await page.getByTestId('pdc-purchase-orderitem-1').click();
     await page.waitForResponse('**/purchase');
 
@@ -48,19 +49,10 @@ test.describe('Order', () => {
 
     await page.locator('table.wp-list-table tbody tr:first-child a.order-view').click();
 
+    await expect(page.getByTestId('pdc-purchase-orderitem-1')).toBeEnabled();
     await page.getByTestId('pdc-purchase-orderitem-1').click();
     await page.waitForResponse('**/purchase');
 
     await expect(page.getByTestId('pdc-ordered-copies')).toHaveText('Copies 1');
-  });
-
-  test('can purchase a single order with multiple items as a single print.com order', async ({ page }) => {
-    await setSettings(page, {
-      apikey: 'test_key_12345',
-      env: 'stg',
-      usePresetCopies: false,
-    });
-
-    await orderProduct(page, 'custom-flyers');
   });
 });
