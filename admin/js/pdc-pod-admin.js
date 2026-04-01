@@ -173,8 +173,8 @@
   }
 
   $(window).load(function () {
-    $('#pdc-file-upload').on('click', orderItemAttachPdf);
-    $('#pdc-order').on('click', purchaseOrderItem);
+    $('.js-pdc-file-upload').on('click', orderItemAttachPdf);
+    $('.js-pdc-purchase-orderitem').on('click', purchaseOrderItem);
     $(`#js-${PLUGIN_NAME}-verify_key`).click(checkCredentials);
     $(`#js-${PLUGIN_NAME}-download-logs`).on('click', downloadLogs);
     observeFormChanges(`#js-${PLUGIN_NAME}-general-form`);

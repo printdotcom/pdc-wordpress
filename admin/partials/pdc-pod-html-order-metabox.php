@@ -27,8 +27,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php
 		$pdc_pod_meta_key_pdf_url   = $this->get_meta_key( 'pdf_url' );
 		$pdc_pod_meta_key_preset_id = $this->get_meta_key( 'preset_id' );
-
+		$item_index = 0;
 		foreach ( $order->get_items() as $pdc_pod_order_item_product ) {
+			$item_index++;
 			$pdc_pod_order_item_id          = $pdc_pod_order_item_product->get_id();
 			$pdc_pod_order_item             = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'order_item' ), true );
 			$pdc_pod_order_item_number      = wc_get_order_item_meta( $pdc_pod_order_item_id, $this->get_meta_key( 'order_item_number' ), true );
@@ -92,14 +93,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<?php
 								if ( empty( $pdc_pod_pdf_url ) ) {
 									?>
-								<button type="button" id="pdc-file-upload" data-order-item-id="<?php echo esc_attr( $pdc_pod_order_item_id ); ?>" class="button button-secondary"><?php esc_html_e( 'Upload PDF', 'pdc-pod' ); ?></button><?php } ?>
-								<?php
-								if ( $pdc_pod_pdf_url ) {
-									?>
-								<button type="button" id="pdc-file-upload" data-order-item-id="<?php echo esc_attr( $pdc_pod_order_item_id ); ?>" class="button button-secondary"><?php esc_html_e( 'Replace PDF', 'pdc-pod' ); ?></button><?php } ?>
-								<?php if ( $pdc_pod_has_preset ) { ?>
-									<button type="button" id="pdc-order" data-testid="pdc-purchase-orderitem" data-order-item-id="<?php echo esc_attr( $pdc_pod_order_item_id ); ?>" class="button button-primary"><?php esc_html_e( 'Purchase', 'pdc-pod' ); ?></button>
+									<button
+										type="button"
+										id="pdc-file-upload-<?php echo esc_attr($item_index); ?>"
+										data-order-item-id="<?php echo esc_attr( $pdc_pod_order_item_id ); ?>"
+										class="button button-secondary js-pdc-file-upload">
+										<?php esc_html_e( 'Upload PDF', 'pdc-pod' ); ?>
+									</button>
 								<?php } ?>
+
+								<?php if ( $pdc_pod_pdf_url ) { ?>
+									<button type="button" id="pdc-file-upload" data-order-item-id="<?php echo esc_attr( $pdc_pod_order_item_id ); ?>" class="button button-secondary"><?php esc_html_e( 'Replace PDF', 'pdc-pod' ); ?></button>
+								<?php } ?>
+								<?php if ( $pdc_pod_has_preset ) { ?>
+									<button
+										type="button"
+										id="pdc-order-<?php echo esc_attr($item_index); ?>"
+										data-testid="pdc-purchase-orderitem-<?php echo esc_attr($item_index); ?>"
+										data-order-item-id="<?php echo esc_attr( $pdc_pod_order_item_id ); ?>"
+										class="button button-primary js-pdc-purchase-orderitem">
+										<?php esc_html_e( 'Purchase', 'pdc-pod' ); ?>
+									</button>
+								<?php } ?>
+
 								<span class="spinner" id="js-pdc-action-spinner"></span>
 								<div class="notice-warning"><span id="js-pdc-request-response"></span></div>
 							<?php } ?>
@@ -107,6 +123,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</div>
 				</div>
 			</div>
-		<?php } ?>
+		<?php 
+			
+		} ?>
 	</div>
 </div>
