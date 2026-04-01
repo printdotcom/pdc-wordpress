@@ -439,7 +439,7 @@ class AdminCore {
 	 * @return void
 	 */
 	public function section_support() {
-		include plugin_dir_path( __FILE__ ) . 'partials/' . PDC_POD_NAME . '-admin-section-support.php';
+		include __DIR__ . '/partials/' . PDC_POD_NAME . '-admin-section-support.php';
 	}
 
 	/**
