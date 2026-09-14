@@ -17,6 +17,7 @@ jobs:
       matrix:
         include:
           - { wp: 60, php: 74 }
+          - { wp: 68, php: 82 }
           - { wp: 69, php: 83 }
           - { wp: 71, php: 84 }
     steps:
