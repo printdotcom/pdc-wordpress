@@ -417,4 +417,46 @@ class Test_APIClient extends TestCase {
 		putenv( 'PDC_POD_API_BASE_URL' );
 		putenv( 'PDC_POD_API_KEY' );
 	}
+
+	/**
+	 * A timed out order POST must not be reported as a failure: Print.com may
+	 * have accepted the order, and calling it failed invites a second purchase.
+	 *
+	 * @since 1.5.0
+	 */
+	public function test_purchase_order_items_reports_a_timeout_distinctly() {
+		putenv( 'PDC_POD_API_BASE_URL=https://testapi.print.com' );
+		putenv( 'PDC_POD_API_KEY=fake-key' );
+
+		$timeout_error = new \WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out after 120001 milliseconds' );
+
+		WP_Mock::userFunction( 'wp_remote_request', [ 'return' => $timeout_error ] );
+		WP_Mock::userFunction( 'is_wp_error', [ 'return' => true ] );
+		WP_Mock::userFunction( 'get_option', [ 'return' => 'none' ] );
+		WP_Mock::userFunction( 'wp_json_encode', [
+			'return' => function ( $data ) {
+				return json_encode( $data );
+			},
+		] );
+
+		$order = \Mockery::mock( 'WC_Order' );
+		$order->shouldReceive( 'get_address' )->andReturn( [ 'city' => 'Deventer' ] );
+		$order->shouldReceive( 'get_id' )->andReturn( 42 );
+		$order->shouldReceive( 'get_billing_email' )->andReturn( 'test@example.com' );
+
+		WP_Mock::userFunction( 'add_query_arg', [ 'return' => 'https://example.com/webhook' ] );
+		WP_Mock::userFunction( 'rest_url', [ 'return' => 'https://example.com/wp-json/pdc/v1/orders/webhook' ] );
+		WP_Mock::userFunction( 'esc_url_raw', [ 'return' => 'https://example.com/webhook' ] );
+
+		$client = new APIClient();
+
+		// A preset lookup is attempted first and times out too, which is enough
+		// to prove the timeout is propagated rather than flattened to a failure.
+		$result = $client->purchase_order_items( $order, [], [] );
+
+		$this->assertTrue( in_array( $result->get_error_code(), [ 'pdc_request_timeout', 'pdc_purchase_timeout' ], true ) );
+
+		putenv( 'PDC_POD_API_BASE_URL' );
+		putenv( 'PDC_POD_API_KEY' );
+	}
 }
