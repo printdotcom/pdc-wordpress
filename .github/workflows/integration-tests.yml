@@ -12,7 +12,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       matrix:
         include:
@@ -91,7 +91,7 @@ jobs:
         run: ./bin/test-e2e ${{ matrix.wp }} ${{ matrix.php }}
 
       - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: always()
         with:
           name: playwright-report-${{ matrix.wp }}-${{ matrix.php }}
           path: playwright-report/
