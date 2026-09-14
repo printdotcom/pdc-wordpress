@@ -81,10 +81,5 @@ We have a more information in our knowledge base at https://knowledge.print.com/
 
 Print.com is pure print passion, only for pros. A specialised crew, access to the latest technology, and a selection of over 1000 premium printed products. So tell us: what does your ideal print journey look like? Book a free test flight and discover what first-class service is all about.
 
-== Roadmap ==
-Soon to come:
-
-* Configure automatic purchasing
-
 
 
