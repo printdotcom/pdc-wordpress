@@ -88,8 +88,8 @@
     frame.open();
   }
 
-  function refreshOrder() {
-    $('#js-pdc-order-metabox').load(`${document.URL} #js-pdc-order-fieldset`);
+  function refreshOrder(done) {
+    $('#js-pdc-order-metabox').load(`${document.URL} #js-pdc-order-fieldset`, done);
   }
 
   async function purchaseOrderItem(e) {
@@ -99,7 +99,17 @@
       $('#js-pdc-order-fieldset').prop('disabled', true);
       $('#js-pdc-purchase-error').prop('hidden', true);
       const orderItemId = e.target.getAttribute('data-order-item-id');
-      const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/order-items/${encodeURIComponent(orderItemId)}/purchase`, {
+      const purchaseState = e.target.getAttribute('data-purchase-state');
+      let force = '';
+      if (purchaseState) {
+        // The item is held because an earlier purchase may have gone through.
+        if (!window.confirm(PDC_POD_ADMIN.confirm_force_purchase)) {
+          $('#js-pdc-order-fieldset').prop('disabled', false);
+          return;
+        }
+        force = '?force=1';
+      }
+      const response = await fetch(`${PDC_POD_ADMIN.root}pdc/v1/order-items/${encodeURIComponent(orderItemId)}/purchase${force}`, {
         method: 'POST',
         headers: {
           'X-WP-Nonce': PDC_POD_ADMIN.nonce,
@@ -112,7 +122,7 @@
       }
       refreshOrder();
     } catch (err) {
-      showError('Failed to place order', err.message);
+      refreshOrder(() => showError('Failed to place order', err.message));
     } finally {
       $(e.currentTarget).prop('disabled', false);
     }
@@ -137,7 +147,7 @@
       }
       refreshOrder();
     } catch (err) {
-      showError('Failed to purchase all order items', err.message);
+      refreshOrder(() => showError('Failed to purchase all order items', err.message));
     } finally {
       $('#js-pdc-order-fieldset').prop('disabled', false);
     }

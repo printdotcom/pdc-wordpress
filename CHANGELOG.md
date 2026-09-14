@@ -9,12 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- automatic purchasing: buy an order at Print.com when it hits a specified order status
+- the error Print.com last returned is stored on the order item and shown on its row in the order panel
 - preset accessories will be purchased
 
 ### Changed
 
 - admin settings UI
 - support for WordPress 7 and PHP 8.4
+- placing an order waits up to 120 seconds, the order endpoint can take over a minute
+
+### Fixed
+
+- purchasing a single order item no longer purchases an item that was already bought
+- a purchase that times out is recorded as unknown instead of failed, Print.com may have accepted it
+- an order item is held while its purchase is in flight, so a second click, tab or job cannot buy it twice
 
 ## [1.4.0]
 

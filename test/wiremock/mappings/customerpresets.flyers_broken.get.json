@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/customerpresets/flyers_broken",
+    "headers": {
+      "authorization": {
+        "equalTo": "PrintApiKey test_key_12345"
+      }
+    }
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "Content-Type": "text/plain",
+      "Access-Control-Allow-Origin": "*"
+    },
+    "body": "[404] Preset not found."
+  }
+}

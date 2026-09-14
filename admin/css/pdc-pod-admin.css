@@ -128,3 +128,27 @@
 .pdc-pod-settings .nav-tab-active {
 	border-bottom: 2px solid var(--wp-admin-theme-color, #3858e9);
 }
+.pdc-table .pdc-item-error {
+	display: flex;
+	align-items: flex-start;
+	flex-direction: column;
+	margin: 0;
+    padding: 4px;
+    background: #ffe9e9;
+    border-left: 2px solid #d94f4f;
+}
+
+.pdc-table .pdc-item-error-message {
+	display: block;
+	word-break: break-word;
+}
+
+.pdc-table .pdc-item-error-date {
+	display: block;
+	color: #999;
+}
+
+.pdc-table .pdc-item-error.is-unknown {
+    background: #fdf6e3;
+    border-left-color: #dba617;
+}

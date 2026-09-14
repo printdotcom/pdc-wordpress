@@ -19,6 +19,7 @@ $pdc_pod_current_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( 
 $pdc_pod_tabs = array(
 	'general' => __( 'General', 'pdc-pod' ),
 	'product' => __( 'Product', 'pdc-pod' ),
+	'orders'  => __( 'Orders', 'pdc-pod' ),
 	'support' => __( 'Support', 'pdc-pod' ),
 );
 
@@ -49,6 +50,9 @@ $pdc_pod_active_tab_name = $pdc_pod_tabs[ $pdc_pod_current_tab ];
 		} elseif ( 'product' === $pdc_pod_current_tab ) {
 			settings_fields( PDC_POD_NAME . '-product-options' );
 			do_settings_sections( PDC_POD_NAME . '-product' );
+		} elseif ( 'orders' === $pdc_pod_current_tab ) {
+			settings_fields( PDC_POD_NAME . '-orders-options' );
+			do_settings_sections( PDC_POD_NAME . '-orders' );
 		} elseif ( 'support' === $pdc_pod_current_tab ) {
 			settings_fields( PDC_POD_NAME . '-support-options' );
 			do_settings_sections( PDC_POD_NAME . '-support' );

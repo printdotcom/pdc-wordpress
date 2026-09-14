@@ -111,6 +111,13 @@ fi
 echo "Activating plug-in.."
 docker compose -f config/docker-compose.yml run --rm wpcli wp plugin activate pdc-pod --allow-root
 
+# Alternate cron runs the queue in a normal page request.
+docker compose -f config/docker-compose.yml run --rm wpcli wp config set ALTERNATE_WP_CRON true --raw --allow-root
+
+# With cron actually running, WordPress updates itself to the latest release
+# within a minute, so every version in the matrix would test that same release.
+docker compose -f config/docker-compose.yml run --rm wpcli wp config set AUTOMATIC_UPDATER_DISABLED true --raw --allow-root
+
 MAX_ATTEMPTS=10
 ATTEMPT=0
 until curl -s --head --fail "http://localhost:${WORDPRESS_PORT}" >/dev/null; do

@@ -27,6 +27,13 @@
         "en": "A3 Posters"
       },
       "id": "posters_a3"
+    },
+    {
+      "sku": "flyers",
+      "title": {
+        "en": "A5 Flyers (deleted at Print.com)"
+      },
+      "id": "flyers_broken"
     }
   ]
 }

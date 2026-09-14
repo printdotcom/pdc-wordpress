@@ -30,10 +30,14 @@ export async function placeOrder(page) {
   await page.waitForResponse(/\/?wc-ajax=checkout/);
 }
 
+export const AUTO_PURCHASE_HOOK = 'pdc_pod_auto_purchase_order';
+
 interface Settings {
   apikey: string;
   env: 'prod' | 'stg';
   usePresetCopies: boolean;
+  autoPurchase?: boolean;
+  triggerStatus?: string;
 }
 export async function setSettings(page, settings: Settings) {
   await page.goto('/wp-admin/admin.php?page=pdc-pod');
@@ -48,6 +52,53 @@ export async function setSettings(page, settings: Settings) {
     await page.getByTestId('pdc-pod-use_preset_copies').uncheck();
   }
   await page.getByRole('button', { name: 'Save Settings' }).click();
+
+  // Always visit the orders tab so automatic purchasing cannot leak between tests.
+  await page.goto('/wp-admin/admin.php?page=pdc-pod&tab=orders');
+  if (settings.autoPurchase) {
+    await page.getByTestId('pdc-pod-auto_purchase').check();
+    await page.getByTestId('pdc-pod-trigger_status').selectOption(settings.triggerStatus ?? 'processing');
+  } else {
+    await page.getByTestId('pdc-pod-auto_purchase').uncheck();
+  }
+  await page.getByRole('button', { name: 'Save Settings' }).click();
+}
+
+/**
+ * Runs every pending Action Scheduler job for a hook from the WooCommerce admin.
+ *
+ * The queue is normally drained by WP-Cron, which is too unpredictable for a
+ * test, so the jobs are executed explicitly through their row action.
+ *
+ * All pending jobs are drained rather than just the first: earlier tests can
+ * leave jobs behind for orders their afterEach has already trashed, and running
+ * one of those would report success while this test's job is still queued.
+ *
+ * Finding nothing pending is fine. With alternate cron enabled, a page load
+ * earlier in the test may already have run the job.
+ */
+export async function runScheduledActions(page, hook: string) {
+  const listUrl = `/wp-admin/admin.php?page=wc-status&tab=action-scheduler&status=pending&s=${encodeURIComponent(hook)}`;
+  let ran = 0;
+
+  for (let attempt = 0; attempt < 25; attempt++) {
+    await page.goto(listUrl);
+
+    const rows = page.locator('table.wp-list-table tbody tr', { hasText: hook });
+    if ((await rows.count()) === 0) {
+      break;
+    }
+
+    // Row actions are hidden until hover, so follow the link rather than click it.
+    const runUrl = await rows.first().locator('a', { hasText: 'Run' }).first().getAttribute('href');
+    expect(runUrl).toBeTruthy();
+
+    await page.goto(runUrl);
+    await expect(page.locator('#wpbody-content')).toContainText('Successfully');
+    ran++;
+  }
+
+  return ran;
 }
 
 export async function configureSimpleProduct(page, productID: string, presetID: string = 'flyers_a5') {

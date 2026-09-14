@@ -12,14 +12,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       matrix:
         include:
           - { wp: 60, php: 74 }
           - { wp: 68, php: 82 }
           - { wp: 69, php: 83 }
-          - { wp: 70, php: 84 }
+          - { wp: 71, php: 84 }
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -92,7 +92,7 @@ jobs:
         run: ./bin/test-e2e ${{ matrix.wp }} ${{ matrix.php }}
 
       - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: always()
         with:
           name: playwright-report-${{ matrix.wp }}-${{ matrix.php }}
           path: playwright-report/

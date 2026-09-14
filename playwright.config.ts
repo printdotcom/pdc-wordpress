@@ -6,7 +6,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: 'html',
+  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'html',
+  globalTimeout: process.env.CI ? 7 * 60 * 1000 : undefined,
   use: {
     baseURL: `http://localhost:${process.env.WORDPRESS_PORT}`,
     trace: 'on-first-retry',
