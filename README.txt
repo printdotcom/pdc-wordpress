@@ -4,7 +4,7 @@ Donate link: https://print.com
 Tags: woocommerce
 Requires at least: 3.4
 Tested up to: 7.0
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,6 +43,10 @@ We have a more information in our knowledge base at https://knowledge.print.com/
 = 1.5.0 =
 
 * new settings UI
+* feat: automatically purchase an order when it reaches configured status
+* feat: show last Print.com API error on the order item
+* fix: a timed out purchase is no longer reported as failed
+* fix: an order item cannot be purchased twice while a purchase is in flight
 * feat: preset accessories will purchased
 
 = 1.4.0 =
