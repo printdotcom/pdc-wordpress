@@ -146,6 +146,8 @@ class Core {
 		$this->loader->add_action( 'woocommerce_process_product_meta_variable', $plugin_admin, 'save_product_data_fields', 10 );
 		$this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'pdc_order_meta_box' );
 		$this->loader->add_action( 'woocommerce_process_shop_order_meta', $plugin_admin, 'on_order_save' );
+		$this->loader->add_action( 'woocommerce_order_status_changed', $plugin_admin, 'maybe_schedule_auto_purchase', 10, 4 );
+		$this->loader->add_action( \PdcPod\Admin\AdminCore::AUTO_PURCHASE_HOOK, $plugin_admin, 'run_auto_purchase' );
 		$this->loader->add_action( 'rest_api_init', $plugin_admin, 'register_pdc_endpoints' );
 	}
 

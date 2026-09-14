@@ -42,6 +42,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$pdc_pod_pdf_url                = $this->get_pdf_url_by_order_item_id( $pdc_pod_order_item_id );
 				$pdc_pod_preset_id              = $this->get_preset_id_by_order_item_id( $pdc_pod_order_item_id );
 
+				$pdc_pod_purchase_state  = $this->get_item_purchase_state( $pdc_pod_order_item_id );
+				$pdc_pod_last_error      = $this->get_order_item_error( $pdc_pod_order_item_id );
+				$pdc_pod_last_error_date = '';
+				if ( $pdc_pod_last_error && ! empty( $pdc_pod_last_error['date'] ) ) {
+					$pdc_pod_last_error_date = wp_date(
+						get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
+						strtotime( $pdc_pod_last_error['date'] )
+					);
+				}
+
 				$pdc_pod_has_file     = ! empty( $pdc_pod_pdf_url );
 				$pdc_pod_has_preset   = ! empty( $pdc_pod_preset_id );
 				$pdc_pod_filename     = basename( $pdc_pod_pdf_url );
@@ -77,6 +87,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 								if ( ! $pdc_pod_has_preset ) {
 									?>
 									<p><?php esc_html_e( 'Missing preset. You need a connected preset on the product to purchase.', 'pdc-pod' ); ?></p><?php } ?>
+								<?php if ( 'in_progress' === $pdc_pod_purchase_state ) { ?>
+									<p class="pdc-item-error is-unknown" data-testid="pdc-item-inprogress-<?php echo esc_attr( $pdc_pod_items_count ); ?>">
+										<span class="pdc-item-error-message"><?php esc_html_e( 'A purchase is in progress. Wait for it to finish before purchasing again.', 'pdc-pod' ); ?></span>
+									</p>
+								<?php } ?>
+								<?php if ( $pdc_pod_last_error ) { ?>
+									<p class="pdc-item-error <?php echo 'unknown' === $pdc_pod_purchase_state ? 'is-unknown' : ''; ?>" data-testid="pdc-item-error-<?php echo esc_attr( $pdc_pod_items_count ); ?>">
+										<span class="pdc-item-error-message"><?php echo esc_html( $pdc_pod_last_error['message'] ); ?></span>
+										<?php if ( $pdc_pod_last_error_date ) { ?>
+											<span class="pdc-item-error-date"><?php echo esc_html( $pdc_pod_last_error_date ); ?></span>
+										<?php } ?>
+									</p>
+								<?php } ?>
 							</div>
 						</div>
 						<div class="table-cell">
@@ -102,6 +125,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 										id="pdc-order-<?php echo esc_attr( $pdc_pod_items_count ); ?>"
 										data-testid="pdc-purchase-orderitem-<?php echo esc_attr( $pdc_pod_items_count ); ?>"
 										data-order-item-id="<?php echo esc_attr( $pdc_pod_order_item_id ); ?>"
+										data-purchase-state="<?php echo esc_attr( $pdc_pod_purchase_state ); ?>"
 										class="button button-primary js-pdc-purchase-orderitem"
 										<?php
 										if ( ! $pdc_pod_can_purchase ) {
@@ -109,7 +133,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 										}
 										?>
 										>
-										<?php esc_html_e( 'Purchase', 'pdc-pod' ); ?>
+										<?php
+										if ( '' !== $pdc_pod_purchase_state ) {
+											esc_html_e( 'Purchase anyway', 'pdc-pod' );
+										} else {
+											esc_html_e( 'Purchase', 'pdc-pod' );
+										}
+										?>
 									</button>
 
 									<span class="spinner"></span>

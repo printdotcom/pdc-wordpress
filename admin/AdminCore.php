@@ -34,6 +34,14 @@ use PdcPod\Includes\Logger;
  */
 class AdminCore {
 	/**
+	 * Action Scheduler hook used to run a queued automatic purchase.
+	 *
+	 * @since 1.5.0
+	 * @var string
+	 */
+	const AUTO_PURCHASE_HOOK = 'pdc_pod_auto_purchase_order';
+
+	/**
 	 * Print.com API client instance.
 	 *
 	 * @since 1.0.0
@@ -87,10 +95,11 @@ class AdminCore {
 			PDC_POD_NAME . '-admin',
 			'PDC_POD_ADMIN',
 			array(
-				'root'        => esc_url_raw( rest_url() ),
-				'nonce'       => wp_create_nonce( 'wp_rest' ),
-				'plugin_name' => PDC_POD_NAME,
-				'pdc_url'     => $this->pdc_client->get_api_base_url(),
+				'root'                   => esc_url_raw( rest_url() ),
+				'nonce'                  => wp_create_nonce( 'wp_rest' ),
+				'plugin_name'            => PDC_POD_NAME,
+				'pdc_url'                => $this->pdc_client->get_api_base_url(),
+				'confirm_force_purchase' => __( 'This item may already have been purchased at Print.com. Check there first. Purchase again anyway?', 'pdc-pod' ),
 			)
 		);
 	}
@@ -122,6 +131,12 @@ class AdminCore {
 			'Product',
 			array( $this, 'section_product' ),
 			PDC_POD_NAME . '-product',
+		);
+		add_settings_section(
+			PDC_POD_NAME . '-orders',
+			'Orders',
+			array( $this, 'section_orders' ),
+			PDC_POD_NAME . '-orders',
 		);
 		add_settings_section(
 			PDC_POD_NAME . '-support',
@@ -166,6 +181,19 @@ class AdminCore {
 				'type'              => 'array',
 				'default'           => array( 'use_preset_copies' => false ),
 				'sanitize_callback' => array( $this, 'sanitize_product' ),
+			)
+		);
+		// Order configuration: array of options controlling automatic purchasing.
+		register_setting(
+			PDC_POD_NAME . '-orders-options',
+			PDC_POD_NAME . '-orders',
+			array(
+				'type'              => 'array',
+				'default'           => array(
+					'auto_purchase'  => false,
+					'trigger_status' => 'processing',
+				),
+				'sanitize_callback' => array( $this, 'sanitize_orders' ),
 			)
 		);
 		// Log level setting: controls which messages are written to the log.
@@ -438,6 +466,93 @@ class AdminCore {
 	}
 
 	/**
+	 * Sanitizes the order configuration option value.
+	 *
+	 * Supports:
+	 * - auto_purchase: bool. Checkbox style input.
+	 * - trigger_status: string. An order status key without the 'wc-' prefix.
+	 *
+	 * An unknown or disallowed status falls back to 'processing' so that a
+	 * tampered or stale value can never arm the purchase on, for example, a
+	 * cancelled order.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param mixed $value Raw option value.
+	 * @return array Sanitized configuration array.
+	 */
+	public function sanitize_orders( $value ) {
+		$sanitized = array(
+			'auto_purchase'  => false,
+			'trigger_status' => 'processing',
+		);
+
+		if ( ! is_array( $value ) ) {
+			return $sanitized;
+		}
+
+		$sanitized['auto_purchase'] = ! empty( $value['auto_purchase'] );
+
+		$trigger_status = isset( $value['trigger_status'] ) ? sanitize_key( $value['trigger_status'] ) : '';
+		if ( array_key_exists( $trigger_status, $this->get_auto_purchase_statuses() ) ) {
+			$sanitized['trigger_status'] = $trigger_status;
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Lists the order statuses that may trigger an automatic purchase.
+	 *
+	 * Every registered status is offered, including statuses added by other
+	 * plugins, except the ones where purchasing print would always be wrong.
+	 * Keys are returned without the 'wc-' prefix so they can be compared
+	 * directly to the status passed by woocommerce_order_status_changed.
+	 *
+	 * @since 1.5.0
+	 * @return array Map of status key to translated label.
+	 */
+	public function get_auto_purchase_statuses() {
+		if ( ! function_exists( 'wc_get_order_statuses' ) ) {
+			return array();
+		}
+
+		$denied  = array( 'wc-pending', 'wc-cancelled', 'wc-refunded', 'wc-failed', 'wc-checkout-draft' );
+		$allowed = array();
+		foreach ( wc_get_order_statuses() as $status_key => $status_label ) {
+			if ( in_array( $status_key, $denied, true ) ) {
+				continue;
+			}
+			$allowed[ preg_replace( '/^wc-/', '', $status_key ) ] = $status_label;
+		}
+
+		return $allowed;
+	}
+
+	/**
+	 * Reads the stored order configuration.
+	 *
+	 * Normalizes types only. The trigger status is deliberately not validated
+	 * against the currently registered statuses here: deactivating the plugin
+	 * that provides a custom status must not silently move the trigger onto
+	 * another status.
+	 *
+	 * @since 1.5.0
+	 * @return array Configuration array with auto_purchase and trigger_status.
+	 */
+	public function get_orders_config() {
+		$config = get_option( PDC_POD_NAME . '-orders' );
+		if ( ! is_array( $config ) ) {
+			$config = array();
+		}
+
+		return array(
+			'auto_purchase'  => ! empty( $config['auto_purchase'] ),
+			'trigger_status' => ! empty( $config['trigger_status'] ) ? sanitize_key( $config['trigger_status'] ) : 'processing',
+		);
+	}
+
+	/**
 	 * Creates the settings page
 	 *
 	 * @since       1.0.0
@@ -465,6 +580,16 @@ class AdminCore {
 	 */
 	public function section_product() {
 		include plugin_dir_path( __FILE__ ) . 'partials/' . PDC_POD_NAME . '-admin-section-product.php';
+	}
+
+	/**
+	 * Creates the order configuration section.
+	 *
+	 * @since 1.5.0
+	 * @return void
+	 */
+	public function section_orders() {
+		include plugin_dir_path( __FILE__ ) . 'partials/' . PDC_POD_NAME . '-admin-section-orders.php';
 	}
 
 	/**
@@ -626,24 +751,18 @@ class AdminCore {
 			)
 		);
 
-		$order       = wc_get_order( $order_id );
-		$order_items = $order->get_items();
-
-		$purchase_items = array();
-		foreach ( $order_items as $order_item ) {
-			$pdc_pod_preset_id = $this->get_preset_id_by_order_item_id( $order_item->get_ID() );
-			$pdc_pod_pdf_url   = $this->get_pdf_url_by_order_item_id( $order_item->get_ID() );
-			$purchase_date     = wc_get_order_item_meta( $order_item->get_ID(), $this->get_meta_key( 'purchase_date' ), true );
-			if ( ! empty( $pdc_pod_preset_id ) && ! empty( $pdc_pod_pdf_url ) && empty( $purchase_date ) ) {
-				$purchase_items[] = array(
-					'order_item'        => $order_item,
-					'pdc_pod_preset_id' => $pdc_pod_preset_id,
-					'pdc_pod_pdf_url'   => $pdc_pod_pdf_url,
-				);
-			}
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			return new \WP_Error(
+				'pdc_order_not_found',
+				__( 'Order not found.', 'pdc-pod' ),
+				array( 'status' => 404 )
+			);
 		}
 
-		if ( empty( $purchase_items ) ) {
+		$purchasable = $this->get_purchasable_items( $order );
+
+		if ( empty( $purchasable['items'] ) ) {
 			return new \WP_Error(
 				'pdc_no_items_to_purchase',
 				__( 'No valid items found to purchase. Ensure items have both a PDF and a preset assigned.', 'pdc-pod' ),
@@ -651,10 +770,126 @@ class AdminCore {
 			);
 		}
 
+		$pdc_order = $this->purchase_prepared_items( $order, $purchasable['items'] );
+
+		if ( is_wp_error( $pdc_order ) ) {
+			return $pdc_order;
+		}
+
+		return rest_ensure_response(
+			array(
+				'order' => $pdc_order,
+			)
+		);
+	}
+
+	/**
+	 * Splits the items of an order into the ones that can be purchased and the
+	 * ones that cannot.
+	 *
+	 * An item is purchasable when it has a connected preset, an attached PDF and
+	 * has not been purchased before.
+	 *
+	 * Only items that look like they were meant to be Print.com items end up in
+	 * the skipped list: an item with a preset but no PDF (or the other way
+	 * around) is a misconfiguration worth reporting, while an item with neither
+	 * is simply an ordinary WooCommerce product and is ignored silently.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param \WC_Order $order The WooCommerce order.
+	 * @return array {
+	 *     @type array $items   Purchasable items, shaped for purchase_order_items().
+	 *     @type array $skipped Map of order item ID to the reason it was skipped.
+	 * }
+	 */
+	public function get_purchasable_items( $order ) {
+		$items   = array();
+		$skipped = array();
+
+		foreach ( $order->get_items() as $order_item ) {
+			$order_item_id     = $order_item->get_id();
+			$pdc_pod_preset_id = $this->get_preset_id_by_order_item_id( $order_item_id );
+			$pdc_pod_pdf_url   = $this->get_pdf_url_by_order_item_id( $order_item_id );
+			$purchase_date     = wc_get_order_item_meta( $order_item_id, $this->get_meta_key( 'purchase_date' ), true );
+
+			if ( ! empty( $purchase_date ) ) {
+				continue;
+			}
+
+			$purchase_state = $this->get_item_purchase_state( $order_item_id );
+			if ( 'in_progress' === $purchase_state ) {
+				$skipped[ $order_item_id ] = __( 'a purchase is already in progress', 'pdc-pod' );
+				continue;
+			}
+			if ( 'unknown' === $purchase_state ) {
+				$skipped[ $order_item_id ] = __( 'the last purchase timed out, check Print.com before retrying', 'pdc-pod' );
+				continue;
+			}
+
+			if ( empty( $pdc_pod_preset_id ) && empty( $pdc_pod_pdf_url ) ) {
+				// Not a Print.com item at all.
+				continue;
+			}
+
+			if ( empty( $pdc_pod_preset_id ) ) {
+				$skipped[ $order_item_id ] = __( 'no preset connected', 'pdc-pod' );
+				continue;
+			}
+
+			if ( empty( $pdc_pod_pdf_url ) ) {
+				$skipped[ $order_item_id ] = __( 'no PDF attached', 'pdc-pod' );
+				continue;
+			}
+
+			$items[] = array(
+				'order_item'        => $order_item,
+				'pdc_pod_preset_id' => $pdc_pod_preset_id,
+				'pdc_pod_pdf_url'   => $pdc_pod_pdf_url,
+			);
+		}
+
+		return array(
+			'items'   => $items,
+			'skipped' => $skipped,
+		);
+	}
+
+	/**
+	 * Purchases prepared items at Print.com and writes the result back onto the
+	 * WooCommerce order.
+	 *
+	 * Shared by the REST endpoint behind the 'Purchase all' button and by the
+	 * automatic purchase job, so both behave identically.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param \WC_Order $order The WooCommerce order.
+	 * @param array     $items Items as returned by get_purchasable_items().
+	 * @return object|\WP_Error The Print.com order on success.
+	 */
+	public function purchase_prepared_items( $order, array $items ) {
 		$pdc_product_config = get_option( PDC_POD_NAME . '-product' );
-		$result             = $this->pdc_client->purchase_order_items( $order, $purchase_items, $pdc_product_config );
+
+		// Claim the items before the call. Placing an order can take over a
+		// minute, and for that whole minute nothing else may buy them again.
+		foreach ( $items as $item ) {
+			$this->set_item_purchase_state( $item['order_item'], 'in_progress' );
+		}
+
+		$result = $this->pdc_client->purchase_order_items( $order, $items, $pdc_product_config );
 
 		if ( is_wp_error( $result ) ) {
+			$unknown = self::is_unknown_outcome( $result );
+
+			// Print.com rejects the order as a whole, so every item in this
+			// batch carries the reason it was not bought. A definite failure
+			// releases the claim so the item can be retried; a timeout keeps it
+			// held, because Print.com may have accepted the order after all.
+			foreach ( $items as $item ) {
+				$this->set_order_item_error( $item['order_item'], $result );
+				$this->set_item_purchase_state( $item['order_item'], $unknown ? 'unknown' : '' );
+			}
 			return $result;
 		}
 
@@ -677,12 +912,154 @@ class AdminCore {
 		);
 		$order->add_order_note( $note );
 
-		return rest_ensure_response(
+		return $pdc_order;
+	}
+
+	/**
+	 * Queues an automatic purchase when an order reaches the configured status.
+	 *
+	 * Hooked to woocommerce_order_status_changed. The purchase itself is never
+	 * performed here: this hook runs inside the checkout request or a payment
+	 * gateway webhook, and a gateway that times out will retry, which would
+	 * purchase the same print twice.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param int       $order_id    The WooCommerce order ID.
+	 * @param string    $status_from Status the order moved away from.
+	 * @param string    $status_to   Status the order moved to.
+	 * @param \WC_Order $order       The WooCommerce order.
+	 * @return void
+	 */
+	public function maybe_schedule_auto_purchase( $order_id, $status_from, $status_to, $order = null ) {
+		// Required by the WooCommerce hook signature but not used here.
+		unset( $status_from, $order );
+
+		$config = $this->get_orders_config();
+		if ( empty( $config['auto_purchase'] ) || $config['trigger_status'] !== $status_to ) {
+			return;
+		}
+
+		if ( ! function_exists( 'as_schedule_single_action' ) ) {
+			Logger::log(
+				'cannot schedule automatic purchase, action scheduler is unavailable',
+				'error',
+				array( 'order_id' => $order_id )
+			);
+			return;
+		}
+
+		$args = array( 'order_id' => (int) $order_id );
+		if ( function_exists( 'as_has_scheduled_action' ) && as_has_scheduled_action( self::AUTO_PURCHASE_HOOK, $args, PDC_POD_NAME ) ) {
+			return;
+		}
+
+		as_schedule_single_action( time(), self::AUTO_PURCHASE_HOOK, $args, PDC_POD_NAME );
+
+		Logger::log(
+			'scheduled automatic purchase',
+			'debug',
 			array(
-				'order' => $pdc_order,
+				'order_id' => $order_id,
+				'status'   => $status_to,
 			)
 		);
 	}
+
+	/**
+	 * Performs a queued automatic purchase.
+	 *
+	 * Hooked to the Action Scheduler hook queued by maybe_schedule_auto_purchase.
+	 * A failure is never retried: the order is marked failed and the shop owner
+	 * purchases the items manually from the Print.com order panel.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param int $order_id The WooCommerce order ID.
+	 * @return void
+	 */
+	public function run_auto_purchase( $order_id ) {
+		Logger::log(
+			'running automatic purchase',
+			'debug',
+			array(
+				'order_id' => $order_id,
+			)
+		);
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			Logger::log( 'automatic purchase: order not found', 'error', array( 'order_id' => $order_id ) );
+			return;
+		}
+
+		$order_status = $order->get_status();
+		if ( in_array( $order_status, array( 'cancelled', 'refunded', 'trash' ), true ) ) {
+			$order->add_order_note(
+				sprintf(
+					/* translators: %s: current WooCommerce order status */
+					__( 'Automatic purchase skipped, the order is %s.', 'pdc-pod' ),
+					$order_status
+				)
+			);
+			return;
+		}
+
+		$purchasable = $this->get_purchasable_items( $order );
+
+		if ( ! empty( $purchasable['skipped'] ) ) {
+			$order->add_order_note( $this->get_skipped_items_note( $order, $purchasable['skipped'] ) );
+		}
+
+		if ( empty( $purchasable['items'] ) ) {
+			Logger::log( 'automatic purchase: nothing to purchase', 'debug', array( 'order_id' => $order_id ) );
+			return;
+		}
+
+		$pdc_order = $this->purchase_prepared_items( $order, $purchasable['items'] );
+
+		if ( is_wp_error( $pdc_order ) ) {
+			$order->add_order_note(
+				sprintf(
+					/* translators: %s: error message returned by the Print.com API */
+					__( 'Automatic purchase did not complete: %s', 'pdc-pod' ),
+					$pdc_order->get_error_message()
+				)
+			);
+
+			Logger::log(
+				'automatic purchase did not complete',
+				'error',
+				array(
+					'order_id' => $order_id,
+					'error'    => $pdc_order->get_error_message(),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Builds the order note listing the items an automatic purchase skipped.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param \WC_Order $order   The WooCommerce order.
+	 * @param array     $skipped Map of order item ID to the reason it was skipped.
+	 * @return string The order note.
+	 */
+	private function get_skipped_items_note( $order, array $skipped ) {
+		$lines = array();
+		foreach ( $skipped as $skipped_item_id => $reason ) {
+			$skipped_item = $order->get_item( $skipped_item_id );
+			$lines[]      = sprintf( '%1$s (%2$s)', $skipped_item ? $skipped_item->get_name() : $skipped_item_id, $reason );
+		}
+
+		return sprintf(
+			/* translators: %s: comma separated list of order items with the reason they were skipped */
+			__( 'Automatic purchase skipped these items: %s. Purchase them manually once they are complete.', 'pdc-pod' ),
+			implode( ', ', $lines )
+		);
+	}
+
 
 	/**
 	 * Handles verification
@@ -912,9 +1289,34 @@ class AdminCore {
 			);
 		}
 
+		$purchase_date = wc_get_order_item_meta( $order_item_id, $this->get_meta_key( 'purchase_date' ), true );
+		if ( ! empty( $purchase_date ) ) {
+			return new \WP_Error(
+				'pdc_item_already_purchased',
+				__( 'This item has already been purchased at Print.com.', 'pdc-pod' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		$purchase_state = $this->get_item_purchase_state( $order_item_id );
+		if ( '' !== $purchase_state && ! $request->get_param( 'force' ) ) {
+			return new \WP_Error(
+				'pdc_item_purchase_held',
+				'in_progress' === $purchase_state
+					? __( 'A purchase for this item is already in progress.', 'pdc-pod' )
+					: __( 'The last purchase for this item timed out. Check Print.com before purchasing again.', 'pdc-pod' ),
+				array(
+					'status'         => 409,
+					'purchase_state' => $purchase_state,
+				)
+			);
+		}
+
 		$order_item = new \WC_Order_Item_Product( $order_item_id );
 		$order_id   = wc_get_order_id_by_order_item_id( $order_item_id );
 		$order      = wc_get_order( $order_id );
+
+		$this->set_item_purchase_state( $order_item, 'in_progress' );
 
 		$pdc_pod_preset_id = $this->get_preset_id_by_order_item_id( $order_item_id );
 		$pdc_pod_pdf_url   = $this->get_pdf_url_by_order_item_id( $order_item_id );
@@ -928,6 +1330,9 @@ class AdminCore {
 
 		$result = $this->pdc_client->purchase_order_items( $order, array( $item ), $pdc_product_config );
 		if ( is_wp_error( $result ) ) {
+			$this->set_order_item_error( $order_item, $result );
+			$this->set_item_purchase_state( $order_item, self::is_unknown_outcome( $result ) ? 'unknown' : '' );
+
 			$status = absint( $result->get_error_code() );
 			if ( 0 === $status ) {
 				$status = 500;
@@ -970,6 +1375,9 @@ class AdminCore {
 	 * @return void
 	 */
 	private function update_order_item( $order_item, $pdc_order ) {
+		// The item is bought, so whatever went wrong before no longer applies.
+		$order_item->delete_meta_data( $this->get_meta_key( 'last_error' ) );
+		$order_item->delete_meta_data( $this->get_meta_key( 'purchase_state' ) );
 		$order_item->update_meta_data( $this->get_meta_key( 'order' ), $pdc_order );
 		$order_item->update_meta_data( $this->get_meta_key( 'purchase_date' ), gmdate( 'c' ) );
 		$order_number = $pdc_order->orderNumber; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
@@ -1010,6 +1418,106 @@ class AdminCore {
 		$order_item->update_meta_data( $this->get_meta_key( 'order_item' ), $pdc_order_item );
 		$order_item->update_meta_data( $this->get_meta_key( 'order_item_shipment' ), $pdc_order_item_shipment );
 		$order_item->save();
+	}
+
+	/**
+	 * Stores the error Print.com last returned for an order item.
+	 *
+	 * Kept on the item itself so the shop owner can see why a purchase did not
+	 * happen, whether it was attempted automatically or by hand.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param \WC_Order_Item $order_item The WooCommerce order item.
+	 * @param \WP_Error      $error      The error returned by the API client.
+	 * @return void
+	 */
+	private function set_order_item_error( $order_item, $error ) {
+		$message = wp_strip_all_tags( (string) $error->get_error_message() );
+
+		$order_item->update_meta_data(
+			$this->get_meta_key( 'last_error' ),
+			array(
+				'code'    => (string) $error->get_error_code(),
+				'message' => mb_substr( $message, 0, 500 ),
+				'date'    => gmdate( 'c' ),
+			)
+		);
+		$order_item->save_meta_data();
+	}
+
+	/**
+	 * Determines whether an error leaves the purchase outcome unknown.
+	 *
+	 * A timed out request may still have been carried out by Print.com, so it
+	 * must never be presented as a failure: that is what invites a second, real
+	 * purchase of the same print.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param \WP_Error $error The error returned by the API client.
+	 * @return bool True when we cannot know whether the order was placed.
+	 */
+	private static function is_unknown_outcome( $error ) {
+		return in_array(
+			$error->get_error_code(),
+			array( 'pdc_request_timeout', 'pdc_purchase_timeout' ),
+			true
+		);
+	}
+
+	/**
+	 * Records whether a purchase is in flight for an order item.
+	 *
+	 * This is the guard that stops the same print being bought twice. It is
+	 * written before the API call, because the call itself can take over a
+	 * minute and 'purchase_date' is only written once it succeeds.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param \WC_Order_Item $order_item The WooCommerce order item.
+	 * @param string         $state      'in_progress', 'unknown', or '' to release.
+	 * @return void
+	 */
+	private function set_item_purchase_state( $order_item, $state ) {
+		if ( '' === $state ) {
+			$order_item->delete_meta_data( $this->get_meta_key( 'purchase_state' ) );
+		} else {
+			$order_item->update_meta_data( $this->get_meta_key( 'purchase_state' ), $state );
+		}
+		$order_item->save_meta_data();
+	}
+
+	/**
+	 * Reads the purchase state of an order item.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param int $order_item_id The WooCommerce order item ID.
+	 * @return string 'in_progress', 'unknown', or '' when nothing is in flight.
+	 */
+	public function get_item_purchase_state( $order_item_id ) {
+		$state = wc_get_order_item_meta( $order_item_id, $this->get_meta_key( 'purchase_state' ), true );
+
+		return in_array( $state, array( 'in_progress', 'unknown' ), true ) ? $state : '';
+	}
+
+	/**
+	 * Reads the error Print.com last returned for an order item.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param int $order_item_id The WooCommerce order item ID.
+	 * @return array|null Error with code, message and date, or null when there is none.
+	 */
+	public function get_order_item_error( $order_item_id ) {
+		$error = wc_get_order_item_meta( $order_item_id, $this->get_meta_key( 'last_error' ), true );
+
+		if ( ! is_array( $error ) || empty( $error['message'] ) ) {
+			return null;
+		}
+
+		return $error;
 	}
 
 	/**

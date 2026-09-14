@@ -23,6 +23,24 @@ use PdcPod\Includes\Logger;
  * @subpackage Pdc_Pod/admin
  */
 class APIClient {
+	/**
+	 * Timeout in seconds for ordinary API requests.
+	 *
+	 * @since 1.5.0
+	 * @var int
+	 */
+	const REQUEST_TIMEOUT = 30;
+
+	/**
+	 * Timeout in seconds for placing an order.
+	 *
+	 * Placing an order can take well over a minute, and aborting early is worse
+	 * than waiting: Print.com may have accepted the order while we gave up on it.
+	 *
+	 * @since 1.5.0
+	 * @var int
+	 */
+	const PURCHASE_TIMEOUT = 120;
 
 	/**
 	 * Base URL of the Print.com API.
@@ -91,12 +109,13 @@ class APIClient {
 	 * @param string     $path    The path to request.
 	 * @param array|null $data    Optional data to send in the request.
 	 * @param array      $headers Optional headers to send with the request.
+	 * @param int        $timeout Request timeout in seconds.
 	 * @return string|WP_Error The unparsed response from the API.
 	 */
-	private function perform_authenticated_request( $method, $path, $data = null, $headers = array() ) {
+	private function perform_authenticated_request( $method, $path, $data = null, $headers = array(), $timeout = self::REQUEST_TIMEOUT ) {
 		$url   = $this->pdc_pod_api_base_url . $path;
 		$token = $this->get_token();
-		return $this->perform_http_request( $method, $url, $data, $token, $headers );
+		return $this->perform_http_request( $method, $url, $data, $token, $headers, $timeout );
 	}
 
 	/**
@@ -123,11 +142,41 @@ class APIClient {
 	 * @param array       $headers Additional headers to send with the request.
 	 * @return string|WP_Error The unparsed response from the API.
 	 */
-	private function perform_http_request( $method, $url, $data = null, $token = null, $headers = array() ) {
+	/**
+	 * Determines whether a transport error was caused by a timeout.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param \WP_Error $error The error returned by the HTTP transport.
+	 * @return bool True when the request timed out.
+	 */
+	private static function is_timeout( $error ) {
+		if ( 'http_request_failed' !== $error->get_error_code() ) {
+			return false;
+		}
+
+		return false !== stripos( $error->get_error_message(), 'timed out' )
+			|| false !== stripos( $error->get_error_message(), 'timeout' );
+	}
+
+	/**
+	 * Performs an HTTP request to the Print.com API using WordPress HTTP API.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string      $method  The HTTP method to use.
+	 * @param string      $url     The URL to request.
+	 * @param array|null  $data    The data to send in the request.
+	 * @param string|null $token   The access token to use.
+	 * @param array       $headers Additional headers to send with the request.
+	 * @param int         $timeout Request timeout in seconds.
+	 * @return string|WP_Error The unparsed response from the API.
+	 */
+	private function perform_http_request( $method, $url, $data = null, $token = null, $headers = array(), $timeout = self::REQUEST_TIMEOUT ) {
 		$method = strtoupper( $method );
 
 		$args = array(
-			'timeout' => 30,
+			'timeout' => $timeout,
 			'headers' => array(
 				'Accept' => 'application/json',
 			),
@@ -161,6 +210,18 @@ class APIClient {
 
 		$response = wp_remote_request( $url, array_merge( $args, array( 'method' => $method ) ) );
 		if ( is_wp_error( $response ) ) {
+			if ( self::is_timeout( $response ) ) {
+				// A timeout is not a failure: the request may well have been
+				// carried out. Callers must be able to tell the two apart.
+				return new \WP_Error(
+					'pdc_request_timeout',
+					$response->get_error_message(),
+					array(
+						'url'     => $url,
+						'timeout' => $timeout,
+					)
+				);
+			}
 			return $response;
 		}
 
@@ -581,7 +642,8 @@ class APIClient {
 			$order_body,
 			array(
 				'pdc-request-source' => 'pdc-woocommerce',
-			)
+			),
+			self::PURCHASE_TIMEOUT
 		);
 
 		if ( is_wp_error( $result ) ) {
@@ -593,6 +655,17 @@ class APIClient {
 					'environment' => $this->pdc_pod_api_base_url,
 				)
 			);
+
+			if ( 'pdc_request_timeout' === $result->get_error_code() ) {
+				// We do not know whether the order was placed. Saying it failed
+				// would invite a second, real purchase.
+				return new \WP_Error(
+					'pdc_purchase_timeout',
+					'The purchase timed out. Print.com may have received this order, check before purchasing again.',
+					array( 'result' => $result )
+				);
+			}
+
 			return new \WP_Error( 500, 'failed placing the order', array( 'result' => $result ) );
 		}
 
